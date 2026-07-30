@@ -10,7 +10,7 @@ import { User, LoginRequest, RegisterRequest, AuthResponse } from '../models/ind
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
-  private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromLocalStorage());
+  private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromSessionStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {}
@@ -29,7 +29,7 @@ export class AuthService {
           roles: response.roles
         };
         this.currentUserSubject.next(user);
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
       })
     );
   }
@@ -48,14 +48,14 @@ export class AuthService {
           roles: response.roles
         };
         this.currentUserSubject.next(user);
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
       })
     );
   }
 
   logout(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }
 
@@ -73,13 +73,13 @@ export class AuthService {
           roles: response.roles
         };
         this.currentUserSubject.next(user);
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
       })
     );
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return sessionStorage.getItem('authToken');
   }
 
   isLoggedIn(): boolean {
@@ -125,15 +125,15 @@ export class AuthService {
     };
 
     this.currentUserSubject.next(updatedUser);
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
   }
 
   private storeToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    sessionStorage.setItem('authToken', token);
   }
 
-  private getUserFromLocalStorage(): User | null {
-    const userJson = localStorage.getItem('currentUser');
+  private getUserFromSessionStorage(): User | null {
+    const userJson = sessionStorage.getItem('currentUser');
     return userJson ? JSON.parse(userJson) : null;
   }
 }
