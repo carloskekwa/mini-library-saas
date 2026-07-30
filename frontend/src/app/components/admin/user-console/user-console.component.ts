@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { User } from '../../../models/index';
+import { AuthService } from '../../../services/auth.service';
 import { UserAdminService } from '../../../services/user-admin.service';
 
 @Component({
@@ -14,7 +15,8 @@ import { UserAdminService } from '../../../services/user-admin.service';
   template: `
     <div class="container-main">
       <h1>User Console</h1>
-      <p class="lead">Search users, update account status, and open moderation workflows.</p>
+      <p class="lead" *ngIf="isAdmin">Search users, update account status, and open moderation workflows.</p>
+      <p class="lead" *ngIf="!isAdmin">Search users and open moderation workflows.</p>
 
       <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
       <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
@@ -26,7 +28,7 @@ import { UserAdminService } from '../../../services/user-admin.service';
               <label class="form-label">Search</label>
               <input class="form-control" [(ngModel)]="search" placeholder="username or email" />
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" *ngIf="isAdmin">
               <label class="form-label">Status</label>
               <select class="form-select" [(ngModel)]="statusFilter">
                 <option value="">All</option>
@@ -52,7 +54,7 @@ import { UserAdminService } from '../../../services/user-admin.service';
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
-                  <th>Status</th>
+                  <th *ngIf="isAdmin">Status</th>
                   <th>Roles</th>
                   <th class="text-end">Actions</th>
                 </tr>
@@ -62,19 +64,19 @@ import { UserAdminService } from '../../../services/user-admin.service';
                   <td>{{ user.id }}</td>
                   <td>{{ user.username }}</td>
                   <td>{{ user.email }}</td>
-                  <td><span class="badge" [class]="'bg-' + (user.status === 'ACTIVE' ? 'success' : (user.status === 'SUSPENDED' ? 'danger' : 'secondary'))">{{ user.status }}</span></td>
+                  <td *ngIf="isAdmin"><span class="badge" [class]="'bg-' + (user.status === 'ACTIVE' ? 'success' : (user.status === 'SUSPENDED' ? 'danger' : 'secondary'))">{{ user.status }}</span></td>
                   <td>{{ user.roles.join(', ') }}</td>
                   <td class="text-end">
                     <div class="btn-group btn-group-sm">
                       <button class="btn btn-outline-primary" (click)="selectUser(user)">Select</button>
-                      <button class="btn btn-outline-success" [disabled]="user.status === 'ACTIVE'" (click)="setStatus(user, 'ACTIVE')">Activate</button>
-                      <button class="btn btn-outline-warning" [disabled]="user.status === 'INACTIVE'" (click)="setStatus(user, 'INACTIVE')">Inactivate</button>
-                      <button class="btn btn-outline-danger" [disabled]="user.status === 'SUSPENDED'" (click)="setStatus(user, 'SUSPENDED')">Suspend</button>
+                      <button *ngIf="isAdmin" class="btn btn-outline-success" [disabled]="user.status === 'ACTIVE'" (click)="setStatus(user, 'ACTIVE')">Activate</button>
+                      <button *ngIf="isAdmin" class="btn btn-outline-warning" [disabled]="user.status === 'INACTIVE'" (click)="setStatus(user, 'INACTIVE')">Inactivate</button>
+                      <button *ngIf="isAdmin" class="btn btn-outline-danger" [disabled]="user.status === 'SUSPENDED'" (click)="setStatus(user, 'SUSPENDED')">Suspend</button>
                     </div>
                   </td>
                 </tr>
                 <tr *ngIf="!loading && users.length === 0">
-                  <td colspan="6" class="text-center text-muted py-4">No users found.</td>
+                  <td [attr.colspan]="isAdmin ? 6 : 5" class="text-center text-muted py-4">No users found.</td>
                 </tr>
               </tbody>
             </table>
@@ -122,13 +124,18 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly authService: AuthService,
     private readonly userAdminService: UserAdminService
   ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.hasRole('ADMIN');
+  }
 
   ngOnInit(): void {
     const query = this.route.snapshot.queryParams;
     this.search = query['search'] || '';
-    this.statusFilter = query['status'] || '';
+    this.statusFilter = this.isAdmin ? (query['status'] || '') : '';
     this.currentPage = Number(query['page'] || 0);
     this.selectedUserId = query['userId'] ? Number(query['userId']) : null;
     this.loadUsers();
@@ -168,7 +175,7 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
 
   clearFilters(): void {
     this.search = '';
-    this.statusFilter = '';
+    this.statusFilter = this.isAdmin ? '' : this.statusFilter;
     this.currentPage = 0;
     this.loadUsers();
   }
@@ -179,6 +186,10 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
   }
 
   setStatus(user: User, status: string): void {
+    if (!this.isAdmin) {
+      return;
+    }
+
     this.userAdminService.updateUserStatus(user.id, status)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -201,7 +212,12 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
   }
 
   openBookRequests(): void {
-    this.router.navigate(['/book-requests']);
+    this.router.navigate(['/book-requests'], {
+      queryParams: {
+        userId: this.selectedUserId || null,
+        staffStatus: 'OPEN'
+      }
+    });
   }
 
   selectUser(user: User): void {
@@ -219,7 +235,7 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
       queryParams: {
         page: this.currentPage || null,
         search: this.search || null,
-        status: this.statusFilter || null,
+        status: this.isAdmin ? (this.statusFilter || null) : null,
         userId: this.selectedUserId || null
       },
       queryParamsHandling: 'merge'

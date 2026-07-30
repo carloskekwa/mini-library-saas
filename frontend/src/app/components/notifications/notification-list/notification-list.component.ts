@@ -32,11 +32,17 @@ export class NotificationListComponent implements OnInit, OnDestroy {
 
   loadNotifications(): void {
     this.loading = true;
-    this.notificationService.getUnreadNotifications()
+    this.notificationService.getNotifications(0, 100)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: Notification[] | { content?: Notification[] }) => {
           this.notifications = Array.isArray(response) ? response : (response.content || []);
+          this.notifications.sort((a, b) => {
+            if (a.isRead !== b.isRead) {
+              return a.isRead ? 1 : -1;
+            }
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
           this.loading = false;
         },
         error: () => {
@@ -47,11 +53,22 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   }
 
   markAsRead(notification: Notification): void {
+    if (notification.isRead) {
+      return;
+    }
+
     this.notificationService.markAsRead(notification.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.loadNotifications();
+          notification.isRead = true;
+          notification.readAt = new Date().toISOString();
+          this.notifications = [...this.notifications].sort((a, b) => {
+            if (a.isRead !== b.isRead) {
+              return a.isRead ? 1 : -1;
+            }
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
         }
       });
   }
@@ -73,7 +90,11 @@ export class NotificationListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.loadNotifications();
+          this.notifications = this.notifications.map((notification) => ({
+            ...notification,
+            isRead: true,
+            readAt: notification.readAt || new Date().toISOString()
+          }));
         }
       });
   }

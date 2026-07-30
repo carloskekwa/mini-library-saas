@@ -131,6 +131,44 @@ public class UserService {
     }
 
     /**
+     * Update profile information for an existing user with optional username updates.
+     */
+    public User updateUserProfile(Long userId, String username, String firstName, String lastName, String email) {
+        User user = getUserById(userId);
+
+        if (username != null) {
+            String normalizedUsername = username.trim();
+            if (!normalizedUsername.isEmpty() && !normalizedUsername.equals(user.getUsername())) {
+                if (userRepository.existsByUsername(normalizedUsername)) {
+                    throw new IllegalArgumentException("Username already exists: " + normalizedUsername);
+                }
+                user.setUsername(normalizedUsername);
+            }
+        }
+
+        if (email != null) {
+            String normalizedEmail = email.trim();
+            if (!normalizedEmail.isEmpty() && !normalizedEmail.equals(user.getEmail()) && userRepository.existsByEmail(normalizedEmail)) {
+                throw new IllegalArgumentException("Email already exists: " + normalizedEmail);
+            }
+            if (!normalizedEmail.isEmpty()) {
+                user.setEmail(normalizedEmail);
+            }
+        }
+
+        if (firstName != null) {
+            user.setFirstName(firstName.trim());
+        }
+        if (lastName != null) {
+            user.setLastName(lastName.trim());
+        }
+
+        User updatedUser = userRepository.save(user);
+        logger.info("Profile updated successfully: {}", updatedUser.getUsername());
+        return updatedUser;
+    }
+
+    /**
      * Assign role to user.
      */
     public User assignRoleToUser(Long userId, String roleName) {

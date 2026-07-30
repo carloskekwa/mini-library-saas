@@ -108,6 +108,10 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.isLibrarian;
   }
 
+  get canSeeUserConsoleMenu(): boolean {
+    return this.isLibrarian;
+  }
+
   get canSeeAdminOnlyMenu(): boolean {
     return this.isAdmin;
   }
@@ -118,6 +122,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get dashboardRoute(): string {
     return this.authService.getDefaultRouteForCurrentUser();
+  }
+
+  openProfile(): void {
+    this.router.navigateByUrl('/profile');
   }
 
   logout(): void {

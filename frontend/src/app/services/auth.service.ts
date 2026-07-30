@@ -112,6 +112,22 @@ export class AuthService {
     return '/dashboard/member';
   }
 
+  updateCurrentUserProfile(profile: User): void {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return;
+    }
+
+    const updatedUser: User = {
+      ...currentUser,
+      ...profile,
+      roles: profile.roles || currentUser.roles
+    };
+
+    this.currentUserSubject.next(updatedUser);
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+  }
+
   private storeToken(token: string): void {
     localStorage.setItem('authToken', token);
   }

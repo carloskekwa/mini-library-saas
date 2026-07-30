@@ -25,7 +25,7 @@ export class AdminDashboardComponent {
     },
     {
       title: 'System Configuration',
-      description: 'Manage config, templates, and scheduler.',
+      description: 'Manage config and templates.',
       route: '/admin/config',
       action: 'Open Config'
     }

@@ -20,7 +20,7 @@
 
       <div class="profile-chip" *ngIf="isLoggedIn">
         <span class="profile-avatar">{{ currentUser?.firstName?.charAt(0) || 'U' }}</span>
-        <div class="profile-copy">
+        <div class="profile-copy" role="button" tabindex="0" (click)="openProfile()" (keydown.enter)="openProfile()">
           <strong>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</strong>
           <small>{{ currentUser?.roles?.[0] || 'MEMBER' }}</small>
         </div>
@@ -48,16 +48,15 @@
         <a *ngIf="canSeeManageCategoriesMenu" routerLink="/manage/categories" routerLinkActive="active"><i class="bi bi-tags"></i><span>Categories</span></a>
         <a *ngIf="canSeeLibrarianInventoryMenu" routerLink="/librarian/borrowed-inventory" routerLinkActive="active"><i class="bi bi-archive"></i><span>Borrowed Inventory</span></a>
         <a *ngIf="canSeeLibrarianReservationMenu" routerLink="/librarian/reservation-inventory" routerLinkActive="active"><i class="bi bi-list-check"></i><span>Reservation Inventory</span></a>
+        <a *ngIf="canSeeUserConsoleMenu" routerLink="/admin/users" routerLinkActive="active"><i class="bi bi-people"></i><span>User Console</span></a>
       </section>
 
       <section *ngIf="isAdmin">
         <h6>Admin Studio</h6>
         <a routerLink="/reports" routerLinkActive="active"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
-        <a routerLink="/admin/penalties" routerLinkActive="active"><i class="bi bi-exclamation-octagon"></i><span>Penalties</span></a>
         <a routerLink="/admin/users" routerLinkActive="active"><i class="bi bi-people"></i><span>User Console</span></a>
         <a routerLink="/admin/config" routerLinkActive="active"><i class="bi bi-sliders"></i><span>System Config</span></a>
         <a routerLink="/admin/email-templates" routerLinkActive="active"><i class="bi bi-envelope-paper"></i><span>Email Templates</span></a>
-        <a routerLink="/admin/scheduled-tasks" routerLinkActive="active"><i class="bi bi-clock-history"></i><span>Scheduled Tasks</span></a>
       </section>
     </aside>
 

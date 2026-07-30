@@ -64,7 +64,7 @@ export const appRoutes: Routes = [
     path: 'admin/users',
     loadComponent: () => import('./components/admin/user-console/user-console.component').then(m => m.UserConsoleComponent),
     canActivate: [AuthGuard],
-    data: { roles: ['ADMIN'] }
+    data: { roles: ['ADMIN', 'LIBRARIAN'] }
   },
   {
     path: 'admin/config',
@@ -114,6 +114,12 @@ export const appRoutes: Routes = [
   {
     path: 'book-requests',
     loadComponent: () => import('./components/book-requests/book-requests.component').then(m => m.BookRequestsComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['MEMBER', 'LIBRARIAN', 'ADMIN'] }
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [AuthGuard],
     data: { roles: ['MEMBER', 'LIBRARIAN', 'ADMIN'] }
   },

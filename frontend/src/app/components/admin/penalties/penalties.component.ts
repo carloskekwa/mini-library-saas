@@ -20,7 +20,7 @@ import { takeUntil } from 'rxjs/operators';
       <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
       <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
 
-      <div class="card mb-4">
+      <div class="card mb-4" *ngIf="canAdminActions">
         <div class="card-header"><h5 class="mb-0">Create Penalty</h5></div>
         <div class="card-body">
           <div class="row g-3">
@@ -39,7 +39,7 @@ import { takeUntil } from 'rxjs/operators';
         </div>
       </div>
 
-      <div class="card" *ngIf="canAdminActions">
+      <div class="card" *ngIf="canViewActivePenalties">
         <div class="card-header"><h5 class="mb-0">Active Penalties by User</h5></div>
         <div class="card-body">
           <div class="d-flex gap-2 mb-3">
@@ -56,7 +56,7 @@ import { takeUntil } from 'rxjs/operators';
                   <th>Reason</th>
                   <th>Status</th>
                   <th>Created</th>
-                  <th class="text-end">Action</th>
+                  <th class="text-end" *ngIf="canAdminActions">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,12 +67,12 @@ import { takeUntil } from 'rxjs/operators';
                   <td>{{ item.reason }}</td>
                   <td>{{ item.status }}</td>
                   <td>{{ item.createdAt | date: 'short' }}</td>
-                  <td class="text-end">
+                  <td class="text-end" *ngIf="canAdminActions">
                     <button class="btn btn-sm btn-outline-danger" [disabled]="item.status !== 'ACTIVE'" (click)="lift(item)">Lift</button>
                   </td>
                 </tr>
                 <tr *ngIf="penalties.length === 0">
-                  <td colspan="7" class="text-center text-muted py-4">No penalties loaded.</td>
+                  <td [attr.colspan]="canAdminActions ? 7 : 6" class="text-center text-muted py-4">No penalties loaded.</td>
                 </tr>
               </tbody>
             </table>
@@ -111,11 +111,15 @@ export class PenaltiesComponent implements OnInit, OnDestroy {
     return this.authService.hasRole('ADMIN');
   }
 
+  get canViewActivePenalties(): boolean {
+    return this.authService.hasAnyRole(['ADMIN', 'LIBRARIAN']);
+  }
+
   ngOnInit(): void {
     const queryUserId = this.route.snapshot.queryParams['userId'];
     if (queryUserId) {
       this.lookupUserId = Number(queryUserId);
-      if (this.canAdminActions) {
+      if (this.canViewActivePenalties) {
         this.loadUserPenalties();
       }
     }
@@ -127,6 +131,11 @@ export class PenaltiesComponent implements OnInit, OnDestroy {
   }
 
   createPenalty(): void {
+    if (!this.canAdminActions) {
+      this.error = 'Only admins can create penalties.';
+      return;
+    }
+
     if (!this.createUserId || !this.createReason.trim()) {
       this.error = 'User ID and reason are required';
       return;
@@ -148,6 +157,11 @@ export class PenaltiesComponent implements OnInit, OnDestroy {
   }
 
   loadUserPenalties(): void {
+    if (!this.canViewActivePenalties) {
+      this.error = 'You are not allowed to view penalties.';
+      return;
+    }
+
     if (!this.lookupUserId) {
       this.error = 'User ID is required';
       return;
@@ -167,6 +181,11 @@ export class PenaltiesComponent implements OnInit, OnDestroy {
   }
 
   lift(item: Penalty): void {
+    if (!this.canAdminActions) {
+      this.error = 'Only admins can lift penalties.';
+      return;
+    }
+
     this.penaltyService.liftPenalty(item.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({

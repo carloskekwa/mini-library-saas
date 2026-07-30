@@ -34,7 +34,7 @@ public class PenaltyController {
     }
 
     @GetMapping("/user/{userId}/active")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @Operation(summary = "Get user active penalties")
     public ResponseEntity<List<PenaltyDTO>> getUserActivePenalties(@PathVariable Long userId) {
         List<PenaltyDTO> penalties = penaltyService.getUserActivePenalties(userId);

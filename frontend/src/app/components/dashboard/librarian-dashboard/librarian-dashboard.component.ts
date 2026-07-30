@@ -34,12 +34,6 @@ export class LibrarianDashboardComponent {
       description: 'Generate popular books and circulation reports.',
       route: '/reports',
       action: 'Open Reports'
-    },
-    {
-      title: 'Batch Import',
-      description: 'Create and monitor catalog import jobs.',
-      route: '/operations/batch-import',
-      action: 'Open Batch Jobs'
     }
   ];
 }

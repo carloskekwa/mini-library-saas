@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { BookRequestService } from '../../services/book-request.service';
 import { AuthService } from '../../services/auth.service';
 import { BookRequest } from '../../models/index';
@@ -17,8 +18,9 @@ import { takeUntil } from 'rxjs/operators';
 export class BookRequestsComponent implements OnInit, OnDestroy {
   userRequests: BookRequest[] = [];
   staffRequests: BookRequest[] = [];
-  staffStatusOptions: string[] = ['ALL', 'PENDING', 'APPROVED', 'ORDERED', 'REJECTED', 'FULFILLED'];
+  staffStatusOptions: string[] = ['ALL', 'OPEN', 'PENDING', 'APPROVED', 'ORDERED', 'REJECTED', 'FULFILLED'];
   selectedStaffStatus = 'ALL';
+  staffUserIdFilter: number | null = null;
 
   loading = false;
   error = '';
@@ -33,10 +35,18 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly bookRequestService: BookRequestService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const query = this.route.snapshot.queryParams;
+    const requestedStatus = (query['staffStatus'] || '').toUpperCase();
+    if (this.staffStatusOptions.includes(requestedStatus)) {
+      this.selectedStaffStatus = requestedStatus;
+    }
+    this.staffUserIdFilter = query['userId'] ? Number(query['userId']) : null;
+
     this.loadUserRequests();
     if (this.canModerate) {
       this.loadStaffRequests();
@@ -169,9 +179,20 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
   }
 
   get filteredStaffRequests(): BookRequest[] {
-    if (this.selectedStaffStatus === 'ALL') {
-      return this.staffRequests;
+    let requests = this.staffRequests;
+
+    if (this.staffUserIdFilter) {
+      requests = requests.filter((request) => request.userId === this.staffUserIdFilter);
     }
-    return this.staffRequests.filter((request) => request.status === this.selectedStaffStatus);
+
+    if (this.selectedStaffStatus === 'ALL') {
+      return requests;
+    }
+
+    if (this.selectedStaffStatus === 'OPEN') {
+      return requests.filter((request) => request.status !== 'REJECTED' && request.status !== 'FULFILLED');
+    }
+
+    return requests.filter((request) => request.status === this.selectedStaffStatus);
   }
 }
