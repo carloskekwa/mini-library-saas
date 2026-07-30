@@ -54,6 +54,8 @@ public class BorrowRecord {
      * BorrowRecord status enumeration
      */
     public enum BorrowStatus {
+        PENDING,
+        REJECTED,
         BORROWED,
         RETURNED,
         OVERDUE,

@@ -16,7 +16,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class BookRequestsComponent implements OnInit, OnDestroy {
   userRequests: BookRequest[] = [];
-  pendingRequests: BookRequest[] = [];
+  staffRequests: BookRequest[] = [];
 
   loading = false;
   error = '';
@@ -37,7 +37,7 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadUserRequests();
     if (this.canModerate) {
-      this.loadPendingRequests();
+      this.loadStaffRequests();
     }
   }
 
@@ -75,7 +75,7 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
         this.justification = '';
         this.loadUserRequests();
         if (this.canModerate) {
-          this.loadPendingRequests();
+          this.loadStaffRequests();
         }
         setTimeout(() => this.successMessage = '', 3000);
       },
@@ -101,15 +101,15 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
       });
   }
 
-  loadPendingRequests(): void {
-    this.bookRequestService.getPendingRequests()
+  loadStaffRequests(): void {
+    this.bookRequestService.getAllRequests()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.pendingRequests = response.content || [];
+          this.staffRequests = response.content || [];
         },
         error: (err) => {
-          this.error = err.error?.message || 'Failed to load pending requests.';
+          this.error = err.error?.message || 'Failed to load staff requests.';
         }
       });
   }
@@ -120,7 +120,8 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.successMessage = 'Request approved.';
-          this.loadPendingRequests();
+          this.loadStaffRequests();
+          this.loadUserRequests();
           setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => {
@@ -135,12 +136,33 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.successMessage = 'Request rejected.';
-          this.loadPendingRequests();
+          this.loadStaffRequests();
+          this.loadUserRequests();
           setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => {
           this.error = err.error?.message || 'Failed to reject request.';
         }
       });
+  }
+
+  order(request: BookRequest): void {
+    this.bookRequestService.orderRequest(request.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Request marked as ordered.';
+          this.loadStaffRequests();
+          this.loadUserRequests();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (err) => {
+          this.error = err.error?.message || 'Failed to order request.';
+        }
+      });
+  }
+
+  canOrder(request: BookRequest): boolean {
+    return this.canModerate && request.status !== 'REJECTED' && request.status !== 'ORDERED' && request.status !== 'FULFILLED';
   }
 }

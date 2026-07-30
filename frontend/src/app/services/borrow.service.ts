@@ -24,6 +24,14 @@ export class BorrowService {
     return this.http.post<BorrowRecord>(`${this.apiUrl}/${borrowId}/renew`, {});
   }
 
+  approveBorrowDemand(borrowId: number): Observable<BorrowRecord> {
+    return this.http.post<BorrowRecord>(`${this.apiUrl}/${borrowId}/approve`, {});
+  }
+
+  rejectBorrowDemand(borrowId: number): Observable<BorrowRecord> {
+    return this.http.post<BorrowRecord>(`${this.apiUrl}/${borrowId}/reject`, {});
+  }
+
   getBorrowHistory(page: number = 0, pageSize: number = 20): Observable<PagedResponse<BorrowRecord>> {
     const params = new HttpParams()
       .set('page', page.toString())

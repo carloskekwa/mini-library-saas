@@ -32,7 +32,7 @@
 
   <div class="card mb-4">
     <div class="card-header">
-      <h5 class="mb-0">Active Borrowings</h5>
+      <h5 class="mb-0">Borrow Requests and Active Borrowings</h5>
     </div>
     <div class="table-responsive">
       <table class="table mb-0">
@@ -57,13 +57,22 @@
             <td>{{ borrow.book.author }}</td>
             <td>{{ borrow.borrowDate | date: 'short' }}</td>
             <td>
-              {{ borrow.dueDate | date: 'short' }}
-              <span *ngIf="isOverdue(borrow.dueDate)" class="badge bg-danger ms-2">OVERDUE</span>
-              <span *ngIf="!isOverdue(borrow.dueDate) && getDaysUntilDue(borrow.dueDate) <= 3" class="badge bg-warning ms-2">
+              <ng-container *ngIf="borrow.status === 'PENDING'; else activeDueDate">
+                Awaiting librarian approval
+              </ng-container>
+              <ng-template #activeDueDate>
+                {{ borrow.dueDate | date: 'short' }}
+              </ng-template>
+              <span *ngIf="borrow.status !== 'PENDING' && isOverdue(borrow.dueDate)" class="badge bg-danger ms-2">OVERDUE</span>
+              <span *ngIf="borrow.status !== 'PENDING' && !isOverdue(borrow.dueDate) && getDaysUntilDue(borrow.dueDate) <= 3" class="badge bg-warning ms-2">
                 {{ getDaysUntilDue(borrow.dueDate) }} days left
               </span>
             </td>
-            <td>{{ borrow.status }}</td>
+            <td>
+              <span class="badge" [class]="getBorrowStatusBadgeClass(borrow.status)">
+                {{ getBorrowStatusLabel(borrow.status) }}
+              </span>
+            </td>
             <td>
               <ng-container *ngIf="canManageBorrowActions; else noMemberActions">
                 <select class="form-select form-select-sm mb-1" [(ngModel)]="selectedCondition[borrow.id]">
@@ -121,8 +130,8 @@
             <td>{{ borrow.borrowDate | date: 'short' }}</td>
             <td>{{ borrow.returnDate | date: 'short' }}</td>
             <td>
-              <span class="badge" [class]="'bg-' + (borrow.status === 'RETURNED' ? 'success' : 'warning')">
-                {{ borrow.status }}
+              <span class="badge" [class]="getBorrowStatusBadgeClass(borrow.status)">
+                {{ getBorrowStatusLabel(borrow.status) }}
               </span>
             </td>
           </tr>

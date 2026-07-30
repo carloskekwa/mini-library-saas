@@ -50,6 +50,11 @@ public class BookRequestService {
         return bookRequestRepository.findByUserId(userId, pageable).map(BookRequestDTO::from);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BookRequestDTO> getAllRequests(Pageable pageable) {
+        return bookRequestRepository.findAllByOrderByRequestedAtDesc(pageable).map(BookRequestDTO::from);
+    }
+
     public void approveRequest(Long requestId) {
         logger.info("Approving request: {}", requestId);
         BookRequest request = bookRequestRepository.findById(requestId)
@@ -64,6 +69,22 @@ public class BookRequestService {
         BookRequest request = bookRequestRepository.findById(requestId)
             .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
         request.setStatus(BookRequest.RequestStatus.REJECTED);
+        request.setProcessedAt(LocalDateTime.now());
+        bookRequestRepository.save(request);
+    }
+
+    public void orderRequest(Long requestId) {
+        logger.info("Ordering request: {}", requestId);
+        BookRequest request = bookRequestRepository.findById(requestId)
+            .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
+
+        if (request.getStatus() == BookRequest.RequestStatus.REJECTED
+            || request.getStatus() == BookRequest.RequestStatus.FULFILLED
+            || request.getStatus() == BookRequest.RequestStatus.ORDERED) {
+            throw new IllegalStateException("Cannot order request in status " + request.getStatus());
+        }
+
+        request.setStatus(BookRequest.RequestStatus.ORDERED);
         request.setProcessedAt(LocalDateTime.now());
         bookRequestRepository.save(request);
     }

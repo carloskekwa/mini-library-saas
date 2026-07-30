@@ -21,6 +21,7 @@ export class BorrowedInventoryComponent implements OnInit, OnDestroy {
   error = '';
   successMessage = '';
   searchTerm = '';
+  statusFilter: 'ALL' | 'PENDING' | 'ACTIVE' = 'ALL';
   currentPage = 0;
   pageSize = 20;
   totalElements = 0;
@@ -65,16 +66,20 @@ export class BorrowedInventoryComponent implements OnInit, OnDestroy {
 
   applyFilter(): void {
     const term = this.searchTerm.trim().toLowerCase();
-    if (!term) {
-      this.filteredRecords = [...this.records];
-      return;
-    }
 
-    this.filteredRecords = this.records.filter((record) =>
-      (record.bookTitle || '').toLowerCase().includes(term) ||
-      (record.bookAuthor || '').toLowerCase().includes(term) ||
-      (record.username || '').toLowerCase().includes(term)
-    );
+    this.filteredRecords = this.records.filter((record) => {
+      const matchesTerm = !term ||
+        (record.bookTitle || '').toLowerCase().includes(term) ||
+        (record.bookAuthor || '').toLowerCase().includes(term) ||
+        (record.username || '').toLowerCase().includes(term);
+
+      const matchesStatus =
+        this.statusFilter === 'ALL' ||
+        (this.statusFilter === 'PENDING' && record.status === 'PENDING') ||
+        (this.statusFilter === 'ACTIVE' && (record.status === 'BORROWED' || record.status === 'OVERDUE'));
+
+      return matchesTerm && matchesStatus;
+    });
   }
 
   changePage(nextPage: number): void {
@@ -96,6 +101,42 @@ export class BorrowedInventoryComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.processingId = null;
           this.error = err.error?.message || 'Failed to renew borrow';
+        }
+      });
+  }
+
+  approveDemand(record: BorrowRecord): void {
+    this.processingId = record.id;
+    this.borrowService.approveBorrowDemand(record.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.processingId = null;
+          this.successMessage = 'Borrow demand approved. Member has been notified for pickup.';
+          this.loadInventory();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (err) => {
+          this.processingId = null;
+          this.error = err.error?.message || 'Failed to approve borrow demand';
+        }
+      });
+  }
+
+  rejectDemand(record: BorrowRecord): void {
+    this.processingId = record.id;
+    this.borrowService.rejectBorrowDemand(record.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.processingId = null;
+          this.successMessage = 'Borrow demand rejected. Member has been notified.';
+          this.loadInventory();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (err) => {
+          this.processingId = null;
+          this.error = err.error?.message || 'Failed to reject borrow demand';
         }
       });
   }

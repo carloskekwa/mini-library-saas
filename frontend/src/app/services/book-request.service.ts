@@ -41,11 +41,22 @@ export class BookRequestService {
     return this.http.get<PagedResponse<BookRequest>>(`${this.apiUrl}/pending`, { params });
   }
 
+  getAllRequests(page: number = 0, pageSize: number = 50): Observable<PagedResponse<BookRequest>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
+    return this.http.get<PagedResponse<BookRequest>>(`${this.apiUrl}/all`, { params });
+  }
+
   approveRequest(requestId: number): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${requestId}/approve`, {});
   }
 
   rejectRequest(requestId: number): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${requestId}/reject`, {});
+  }
+
+  orderRequest(requestId: number): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${requestId}/order`, {});
   }
 }

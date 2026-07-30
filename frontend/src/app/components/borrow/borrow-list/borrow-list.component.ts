@@ -184,6 +184,35 @@ export class BorrowListComponent implements OnInit, OnDestroy {
     return new Date(dueDate) < new Date();
   }
 
+  getBorrowStatusLabel(status: string): string {
+    if (status === 'PENDING') {
+      return 'Pending Approval';
+    }
+    if (status === 'BORROWED') {
+      return 'Borrowed';
+    }
+    if (status === 'OVERDUE') {
+      return 'Overdue';
+    }
+    return status;
+  }
+
+  getBorrowStatusBadgeClass(status: string): string {
+    if (status === 'PENDING') {
+      return 'bg-warning';
+    }
+    if (status === 'BORROWED') {
+      return 'bg-primary';
+    }
+    if (status === 'OVERDUE') {
+      return 'bg-danger';
+    }
+    if (status === 'RETURNED') {
+      return 'bg-success';
+    }
+    return 'bg-secondary';
+  }
+
   hasUnpaidFine(record: ReturnRecord): boolean {
     return Number(record.fineAmount || 0) > 0 && !record.finePaid;
   }

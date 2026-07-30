@@ -27,9 +27,8 @@ export const appRoutes: Routes = [
   },
   {
     path: 'manage/books',
-    loadComponent: () => import('./components/books/book-management/book-management.component').then(m => m.BookManagementComponent),
-    canActivate: [AuthGuard],
-    data: { roles: ['ADMIN', 'LIBRARIAN'] }
+    redirectTo: '/librarian/borrowed-inventory',
+    pathMatch: 'full'
   },
   {
     path: 'manage/categories',

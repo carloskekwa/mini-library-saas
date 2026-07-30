@@ -12,10 +12,10 @@ import { RouterModule } from '@angular/router';
 export class LibrarianDashboardComponent {
   cards = [
     {
-      title: 'Manage Books',
-      description: 'Add, edit, and maintain available copies.',
-      route: '/manage/books',
-      action: 'Open Manager'
+      title: 'Borrow Demand Queue',
+      description: 'Approve pending borrow demands and prepare member pickup.',
+      route: '/librarian/borrowed-inventory',
+      action: 'Open Queue'
     },
     {
       title: 'Category Management',

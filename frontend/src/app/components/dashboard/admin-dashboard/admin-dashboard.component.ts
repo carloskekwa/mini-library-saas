@@ -12,28 +12,10 @@ import { RouterModule } from '@angular/router';
 export class AdminDashboardComponent {
   cards = [
     {
-      title: 'Book Management',
-      description: 'Create, update, and remove catalog entries.',
-      route: '/manage/books',
-      action: 'Open Manager'
-    },
-    {
-      title: 'Category Management',
-      description: 'Maintain category taxonomy used by catalog items.',
-      route: '/manage/categories',
-      action: 'Open Categories'
-    },
-    {
       title: 'Reports and Analytics',
       description: 'Generate and review circulation reports.',
       route: '/reports',
       action: 'Open Reports'
-    },
-    {
-      title: 'Penalties',
-      description: 'Create and lift member penalties.',
-      route: '/admin/penalties',
-      action: 'Open Penalties'
     },
     {
       title: 'Audit Logs',

@@ -52,7 +52,6 @@
 
       <section *ngIf="isLibrarian || isAdmin">
         <h6>Operations</h6>
-        <a *ngIf="canSeeManageBooksMenu" routerLink="/manage/books" routerLinkActive="active"><i class="bi bi-stack"></i><span>Manage Books</span></a>
         <a *ngIf="canSeeManageCategoriesMenu" routerLink="/manage/categories" routerLinkActive="active"><i class="bi bi-tags"></i><span>Categories</span></a>
         <a *ngIf="canSeeLibrarianInventoryMenu" routerLink="/librarian/borrowed-inventory" routerLinkActive="active"><i class="bi bi-archive"></i><span>Borrowed Inventory</span></a>
         <a *ngIf="canSeeLibrarianReservationMenu" routerLink="/librarian/reservation-inventory" routerLinkActive="active"><i class="bi bi-list-check"></i><span>Reservation Inventory</span></a>

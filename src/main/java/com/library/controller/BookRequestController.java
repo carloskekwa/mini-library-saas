@@ -51,6 +51,17 @@ public class BookRequestController {
         return ResponseEntity.ok(requests);
     }
 
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    @Operation(summary = "Get all requests for staff")
+    public ResponseEntity<Page<BookRequestDTO>> getAllRequests(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "50") int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<BookRequestDTO> requests = bookRequestService.getAllRequests(pageable);
+        return ResponseEntity.ok(requests);
+    }
+
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @Operation(summary = "Get user requests")
@@ -78,6 +89,14 @@ public class BookRequestController {
     @Operation(summary = "Reject request")
     public ResponseEntity<Void> rejectRequest(@PathVariable Long requestId) {
         bookRequestService.rejectRequest(requestId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{requestId}/order")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    @Operation(summary = "Mark request as ordered")
+    public ResponseEntity<Void> orderRequest(@PathVariable Long requestId) {
+        bookRequestService.orderRequest(requestId);
         return ResponseEntity.noContent().build();
     }
 }

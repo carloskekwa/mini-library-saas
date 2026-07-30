@@ -53,25 +53,31 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long
     /**
      * Find active borrowed inventory for staff oversight.
      */
-    @Query("SELECT br FROM BorrowRecord br WHERE br.status IN ('BORROWED', 'OVERDUE')")
+    @Query("SELECT br FROM BorrowRecord br WHERE br.status IN ('PENDING', 'BORROWED', 'OVERDUE')")
     Page<BorrowRecord> findBorrowedInventory(Pageable pageable);
+
+    /**
+     * Find pending borrow requests.
+     */
+    @Query("SELECT br FROM BorrowRecord br WHERE br.status = 'PENDING'")
+    Page<BorrowRecord> findPendingBorrowRequests(Pageable pageable);
 
     /**
      * Find active borrows for a user (not yet returned).
      */
-    @Query("SELECT br FROM BorrowRecord br WHERE br.user.id = :userId AND br.status IN ('BORROWED', 'OVERDUE')")
+    @Query("SELECT br FROM BorrowRecord br WHERE br.user.id = :userId AND br.status IN ('PENDING', 'BORROWED', 'OVERDUE')")
     List<BorrowRecord> findActiveBorrowsByUserId(@Param("userId") Long userId);
 
     /**
      * Find active borrow by user and book.
      */
-    @Query("SELECT br FROM BorrowRecord br WHERE br.user.id = :userId AND br.book.id = :bookId AND br.status IN ('BORROWED', 'OVERDUE')")
+    @Query("SELECT br FROM BorrowRecord br WHERE br.user.id = :userId AND br.book.id = :bookId AND br.status IN ('PENDING', 'BORROWED', 'OVERDUE')")
     Optional<BorrowRecord> findActiveByUserAndBook(@Param("userId") Long userId, @Param("bookId") Long bookId);
 
     /**
      * Count active borrows for a user.
      */
-    @Query("SELECT COUNT(br) FROM BorrowRecord br WHERE br.user.id = :userId AND br.status IN ('BORROWED', 'OVERDUE')")
+    @Query("SELECT COUNT(br) FROM BorrowRecord br WHERE br.user.id = :userId AND br.status IN ('PENDING', 'BORROWED', 'OVERDUE')")
     Integer countActiveBorrows(@Param("userId") Long userId);
 
 }

@@ -41,7 +41,7 @@ public class BookRequest {
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
 
-    public enum RequestStatus { PENDING, APPROVED, REJECTED, FULFILLED }
+    public enum RequestStatus { PENDING, APPROVED, REJECTED, ORDERED, FULFILLED }
 
     public BookRequest() {}
     public BookRequest(User user, String bookTitle, String author, String isbn) {

@@ -101,12 +101,12 @@ export class BookListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.successMessage = `Successfully borrowed "${book.title}"`;
+          this.successMessage = `Borrow demand submitted for "${book.title}". Waiting for librarian approval.`;
           this.loadBooks();
           setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => {
-          this.error = err.error?.message || 'Failed to borrow book';
+          this.error = err.error?.message || 'Failed to submit borrow demand';
         }
       });
   }

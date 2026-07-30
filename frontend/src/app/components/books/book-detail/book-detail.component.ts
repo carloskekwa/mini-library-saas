@@ -106,11 +106,11 @@ export class BookDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.successMessage = 'Book borrowed successfully!';
+          this.successMessage = 'Borrow demand submitted. You will be notified when librarian approves pickup.';
           setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => {
-          this.error = err.error?.message || 'Failed to borrow book';
+          this.error = err.error?.message || 'Failed to submit borrow demand';
         }
       });
   }

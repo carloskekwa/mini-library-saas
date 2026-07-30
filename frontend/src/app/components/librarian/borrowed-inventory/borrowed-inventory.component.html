@@ -23,6 +23,11 @@
           [(ngModel)]="searchTerm"
           (input)="applyFilter()"
         />
+        <select class="form-select" [(ngModel)]="statusFilter" (change)="applyFilter()">
+          <option value="ALL">All</option>
+          <option value="PENDING">Pending Demands</option>
+          <option value="ACTIVE">Borrowed and Overdue</option>
+        </select>
       </div>
     </div>
   </div>
@@ -65,20 +70,30 @@
               </div>
             </td>
             <td>
-              <select class="form-select form-select-sm mb-1" [(ngModel)]="selectedCondition[record.id]">
-                <option value="GOOD">GOOD</option>
-                <option value="EXCELLENT">EXCELLENT</option>
-                <option value="FAIR">FAIR</option>
-                <option value="POOR">POOR</option>
-                <option value="DAMAGED">DAMAGED</option>
-              </select>
-              <input class="form-control form-control-sm mb-1" placeholder="Damage notes (optional)" [(ngModel)]="damageNotes[record.id]" />
-              <button class="btn btn-sm btn-primary" [disabled]="processingId === record.id || record.renewalCount >= 3" (click)="renewRecord(record)">
-                {{ processingId === record.id ? 'Processing...' : 'Renew' }}
-              </button>
-              <button class="btn btn-sm btn-danger ms-1" [disabled]="processingId === record.id" (click)="returnRecord(record)">
-                Return
-              </button>
+              <ng-container *ngIf="record.status === 'PENDING'; else activeBorrowActions">
+                <button class="btn btn-sm btn-success" [disabled]="processingId === record.id" (click)="approveDemand(record)">
+                  {{ processingId === record.id ? 'Processing...' : 'Mark Borrowed' }}
+                </button>
+                <button class="btn btn-sm btn-outline-danger ms-1" [disabled]="processingId === record.id" (click)="rejectDemand(record)">
+                  Reject
+                </button>
+              </ng-container>
+              <ng-template #activeBorrowActions>
+                <select class="form-select form-select-sm mb-1" [(ngModel)]="selectedCondition[record.id]">
+                  <option value="GOOD">GOOD</option>
+                  <option value="EXCELLENT">EXCELLENT</option>
+                  <option value="FAIR">FAIR</option>
+                  <option value="POOR">POOR</option>
+                  <option value="DAMAGED">DAMAGED</option>
+                </select>
+                <input class="form-control form-control-sm mb-1" placeholder="Damage notes (optional)" [(ngModel)]="damageNotes[record.id]" />
+                <button class="btn btn-sm btn-primary" [disabled]="processingId === record.id || record.renewalCount >= 3" (click)="renewRecord(record)">
+                  {{ processingId === record.id ? 'Processing...' : 'Renew' }}
+                </button>
+                <button class="btn btn-sm btn-danger ms-1" [disabled]="processingId === record.id" (click)="returnRecord(record)">
+                  Return
+                </button>
+              </ng-template>
             </td>
           </tr>
           <tr *ngIf="filteredRecords.length === 0">

@@ -92,10 +92,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.isMember;
   }
 
-  get canSeeManageBooksMenu(): boolean {
-    return this.isAdmin || this.isLibrarian;
-  }
-
   get canSeeManageCategoriesMenu(): boolean {
     return this.isAdmin || this.isLibrarian;
   }

@@ -65,7 +65,10 @@
 
 .search-pill {
   border-radius: 999px;
-  display: inline-flex;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  max-width: 560px;
   align-items: center;
   gap: 0.5rem;
   padding: 0.55rem 0.9rem;

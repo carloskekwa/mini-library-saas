@@ -111,6 +111,44 @@ public class BorrowController {
     }
 
     /**
+     * Approve pending borrow demand.
+     * POST /api/borrow/{borrowRecordId}/approve
+     */
+    @PostMapping("/{borrowRecordId}/approve")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @Operation(summary = "Approve borrow demand", description = "Approve a pending borrow demand and convert it to active borrow")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Borrow demand approved successfully"),
+        @ApiResponse(responseCode = "400", description = "Borrow demand cannot be approved"),
+        @ApiResponse(responseCode = "404", description = "Borrow record not found")
+    })
+    public ResponseEntity<BorrowRecordDTO> approveBorrowDemand(
+        @PathVariable Long borrowRecordId) {
+
+        BorrowRecordDTO borrowRecord = borrowService.approveBorrowDemand(borrowRecordId);
+        return ResponseEntity.ok(borrowRecord);
+    }
+
+    /**
+     * Reject pending borrow demand.
+     * POST /api/borrow/{borrowRecordId}/reject
+     */
+    @PostMapping("/{borrowRecordId}/reject")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @Operation(summary = "Reject borrow demand", description = "Reject a pending borrow demand")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Borrow demand rejected successfully"),
+        @ApiResponse(responseCode = "400", description = "Borrow demand cannot be rejected"),
+        @ApiResponse(responseCode = "404", description = "Borrow record not found")
+    })
+    public ResponseEntity<BorrowRecordDTO> rejectBorrowDemand(
+        @PathVariable Long borrowRecordId) {
+
+        BorrowRecordDTO borrowRecord = borrowService.rejectBorrowDemand(borrowRecordId);
+        return ResponseEntity.ok(borrowRecord);
+    }
+
+    /**
      * Get borrow history for current user.
      * GET /api/borrow/history
      */

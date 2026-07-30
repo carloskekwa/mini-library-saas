@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.hasAnyRole(['ADMIN', 'LIBRARIAN'])) {
-      this.router.navigateByUrl('/manage/books');
+      this.router.navigateByUrl('/librarian/borrowed-inventory');
     }
   }
 }

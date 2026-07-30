@@ -32,6 +32,7 @@ public class BorrowService {
     private final ReturnRecordRepository returnRecordRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     private static final int MAX_BORROW_DAYS = 14;
     private static final int MAX_ACTIVE_BORROWS = 5;
@@ -43,18 +44,20 @@ public class BorrowService {
     public BorrowService(BorrowRecordRepository borrowRecordRepository,
                          ReturnRecordRepository returnRecordRepository,
                          BookRepository bookRepository,
-                         UserRepository userRepository) {
+                         UserRepository userRepository,
+                         NotificationService notificationService) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.returnRecordRepository = returnRecordRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     /**
-     * Borrow a book for a user.
+      * Create a borrow demand for a user.
      */
     public BorrowRecordDTO borrowBook(Long userId, Long bookId) {
-        logger.info("Processing borrow request: userId={}, bookId={}", userId, bookId);
+          logger.info("Creating borrow demand: userId={}, bookId={}", userId, bookId);
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -62,9 +65,9 @@ public class BorrowService {
         Book book = bookRepository.findById(bookId)
             .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
-        // Check if book is available
+        // Demand can be created only when copies are available for eventual assignment.
         if (book.getAvailableCopies() == null || book.getAvailableCopies() <= 0) {
-            throw new IllegalStateException("Book is not available for borrowing");
+            throw new IllegalStateException("Book is not currently available for borrow demand");
         }
 
         // Check active borrow limit
@@ -78,23 +81,96 @@ public class BorrowService {
             throw new IllegalStateException("User already has this book borrowed");
         }
 
-        // Create borrow record
+        // Create pending demand record. Approval is required before it becomes an active borrow.
         LocalDateTime borrowDate = LocalDateTime.now();
         LocalDateTime dueDate = borrowDate.plusDays(MAX_BORROW_DAYS);
 
         BorrowRecord borrowRecord = new BorrowRecord(user, book, borrowDate, dueDate);
-        borrowRecord.setStatus(BorrowRecord.BorrowStatus.BORROWED);
+        borrowRecord.setStatus(BorrowRecord.BorrowStatus.PENDING);
 
         BorrowRecord saved = borrowRecordRepository.save(borrowRecord);
 
-        // Update book availability
+        logger.info("Borrow demand created successfully: borrowId={}, bookId={}, userId={}", saved.getId(), bookId, userId);
+
+        return BorrowRecordDTO.from(saved);
+    }
+
+    /**
+     * Approve pending borrow demand and convert it into active borrowed status.
+     */
+    public BorrowRecordDTO approveBorrowDemand(Long borrowRecordId) {
+        logger.info("Approving borrow demand: borrowRecordId={}", borrowRecordId);
+
+        BorrowRecord borrowRecord = borrowRecordRepository.findById(borrowRecordId)
+            .orElseThrow(() -> new ResourceNotFoundException("Borrow record not found with id: " + borrowRecordId));
+
+        if (!BorrowRecord.BorrowStatus.PENDING.equals(borrowRecord.getStatus())) {
+            throw new IllegalStateException("Only pending borrow demands can be approved");
+        }
+
+        Book book = borrowRecord.getBook();
+        if (book.getAvailableCopies() == null || book.getAvailableCopies() <= 0) {
+            throw new IllegalStateException("Book is no longer available for approval");
+        }
+
+        LocalDateTime borrowDate = LocalDateTime.now();
+        LocalDateTime dueDate = borrowDate.plusDays(MAX_BORROW_DAYS);
+
+        borrowRecord.setBorrowDate(borrowDate);
+        borrowRecord.setDueDate(dueDate);
+        borrowRecord.setStatus(BorrowRecord.BorrowStatus.BORROWED);
+        borrowRecord.setIsOverdue(false);
+
+        BorrowRecord saved = borrowRecordRepository.save(borrowRecord);
+
         book.setAvailableCopies(book.getAvailableCopies() - 1);
-        if (book.getAvailableCopies() == 0) {
+        if (book.getAvailableCopies() <= 0) {
             book.setStatus(Book.BookStatus.BORROWED);
         }
         bookRepository.save(book);
 
-        logger.info("Book borrowed successfully: borrowId={}, bookId={}, userId={}", saved.getId(), bookId, userId);
+        notificationService.createNotificationWithRelated(
+            saved.getUser().getId(),
+            Notification.NotificationType.BOOK_AVAILABLE,
+            "Borrow Request Approved",
+            "Your borrow request for '" + book.getTitle() + "' is approved. You can come for pickup.",
+            book.getId(),
+            saved.getId()
+        );
+
+        logger.info("Borrow demand approved: borrowRecordId={}, userId={}, bookId={}",
+            saved.getId(), saved.getUser().getId(), book.getId());
+
+        return BorrowRecordDTO.from(saved);
+    }
+
+    /**
+     * Reject pending borrow demand.
+     */
+    public BorrowRecordDTO rejectBorrowDemand(Long borrowRecordId) {
+        logger.info("Rejecting borrow demand: borrowRecordId={}", borrowRecordId);
+
+        BorrowRecord borrowRecord = borrowRecordRepository.findById(borrowRecordId)
+            .orElseThrow(() -> new ResourceNotFoundException("Borrow record not found with id: " + borrowRecordId));
+
+        if (!BorrowRecord.BorrowStatus.PENDING.equals(borrowRecord.getStatus())) {
+            throw new IllegalStateException("Only pending borrow demands can be rejected");
+        }
+
+        borrowRecord.setStatus(BorrowRecord.BorrowStatus.REJECTED);
+        BorrowRecord saved = borrowRecordRepository.save(borrowRecord);
+
+        notificationService.createNotificationWithRelated(
+            saved.getUser().getId(),
+            Notification.NotificationType.SYSTEM_ALERT,
+            "Borrow Request Rejected",
+            "Your borrow request for '" + saved.getBook().getTitle() + "' was rejected. Please contact the librarian for details.",
+            saved.getBook().getId(),
+            saved.getId()
+        );
+
+        logger.info("Borrow demand rejected: borrowRecordId={}, userId={}, bookId={}",
+            saved.getId(), saved.getUser().getId(), saved.getBook().getId());
 
         return BorrowRecordDTO.from(saved);
     }

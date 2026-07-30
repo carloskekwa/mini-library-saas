@@ -11,4 +11,5 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
     List<BookRequest> findByUserId(Long userId);
     Page<BookRequest> findByStatus(BookRequest.RequestStatus status, Pageable pageable);
     Page<BookRequest> findByUserId(Long userId, Pageable pageable);
+    Page<BookRequest> findAllByOrderByRequestedAtDesc(Pageable pageable);
 }

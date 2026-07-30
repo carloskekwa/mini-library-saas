@@ -183,12 +183,15 @@ export interface WishlistItem {
 export interface BookRequest {
   id: number;
   userId: number;
+  username?: string;
+  userEmail?: string;
   bookTitle: string;
   author: string;
-  isbn: string;
+  isbn?: string;
+  justification?: string;
   status: string;
   requestedAt: string;
-  processedAt: string;
+  processedAt?: string;
 }
 
 export interface Report {
