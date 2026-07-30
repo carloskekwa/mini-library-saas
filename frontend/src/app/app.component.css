@@ -1,0 +1,28 @@
+header {
+  margin-bottom: 20px;
+}
+
+main {
+  min-height: calc(100vh - 200px);
+}
+
+footer {
+  margin-top: auto;
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.dropdown-menu {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}

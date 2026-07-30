@@ -1,0 +1,186 @@
+<div class="container-main">
+  <h1>My Borrowings</h1>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h6 class="card-title">Active Borrows</h6>
+          <h2 class="text-primary">{{ activeBorrows.length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h6 class="card-title">Unpaid Fines</h6>
+          <h2 class="text-danger">${{ totalFines.toFixed(2) }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">Active Borrowings</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Author</th>
+            <th>Borrowed Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let borrow of activeBorrows" [class.table-danger]="isOverdue(borrow.dueDate)">
+            <td>
+              <div class="book-cell">
+                <span class="book-letter-cover">{{ getBookCoverLetter(borrow.book.title) }}</span>
+                <span>{{ borrow.book.title }}</span>
+              </div>
+            </td>
+            <td>{{ borrow.book.author }}</td>
+            <td>{{ borrow.borrowDate | date: 'short' }}</td>
+            <td>
+              {{ borrow.dueDate | date: 'short' }}
+              <span *ngIf="isOverdue(borrow.dueDate)" class="badge bg-danger ms-2">OVERDUE</span>
+              <span *ngIf="!isOverdue(borrow.dueDate) && getDaysUntilDue(borrow.dueDate) <= 3" class="badge bg-warning ms-2">
+                {{ getDaysUntilDue(borrow.dueDate) }} days left
+              </span>
+            </td>
+            <td>{{ borrow.status }}</td>
+            <td>
+              <ng-container *ngIf="canManageBorrowActions; else noMemberActions">
+                <select class="form-select form-select-sm mb-1" [(ngModel)]="selectedCondition[borrow.id]">
+                  <option value="GOOD">GOOD</option>
+                  <option value="EXCELLENT">EXCELLENT</option>
+                  <option value="FAIR">FAIR</option>
+                  <option value="POOR">POOR</option>
+                  <option value="DAMAGED">DAMAGED</option>
+                </select>
+                <input class="form-control form-control-sm mb-1" placeholder="Damage notes (optional)" [(ngModel)]="damageNotes[borrow.id]" />
+                <button class="btn btn-sm btn-primary" (click)="renewBook(borrow)" [disabled]="borrow.renewalCount >= 3">
+                  Renew
+                </button>
+                <button class="btn btn-sm btn-danger ms-1" (click)="returnBook(borrow)">
+                  Return
+                </button>
+              </ng-container>
+              <ng-template #noMemberActions>
+                <span class="text-muted">Managed by librarian</span>
+              </ng-template>
+            </td>
+          </tr>
+          <tr *ngIf="activeBorrows.length === 0">
+            <td colspan="6" class="text-center text-muted">No active borrowings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Borrowing History</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Author</th>
+            <th>Borrowed Date</th>
+            <th>Returned Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let borrow of borrowHistory">
+            <td>
+              <div class="book-cell">
+                <span class="book-letter-cover">{{ getBookCoverLetter(borrow.book.title) }}</span>
+                <span>{{ borrow.book.title }}</span>
+              </div>
+            </td>
+            <td>{{ borrow.book.author }}</td>
+            <td>{{ borrow.borrowDate | date: 'short' }}</td>
+            <td>{{ borrow.returnDate | date: 'short' }}</td>
+            <td>
+              <span class="badge" [class]="'bg-' + (borrow.status === 'RETURNED' ? 'success' : 'warning')">
+                {{ borrow.status }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="borrowHistory.length === 0">
+            <td colspan="5" class="text-center text-muted">No borrowing history</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5 class="mb-0">Return Records and Fine Payments</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>Returned</th>
+            <th>Condition</th>
+            <th>Late Days</th>
+            <th>Fine</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of returnRecords">
+            <td>
+              <div class="book-cell">
+                <span class="book-letter-cover">{{ getBookCoverLetter(record.bookTitle) }}</span>
+                <span>{{ record.bookTitle }}</span>
+              </div>
+            </td>
+            <td>{{ record.returnDate | date: 'short' }}</td>
+            <td>{{ record.bookCondition }}</td>
+            <td>{{ record.daysLate }}</td>
+            <td>${{ getFineAmount(record).toFixed(2) }}</td>
+            <td>
+              <span class="badge" [class]="hasUnpaidFine(record) ? 'bg-danger' : 'bg-success'">
+                {{ hasUnpaidFine(record) ? 'UNPAID' : 'PAID / NONE' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-success"
+                      [disabled]="!hasUnpaidFine(record) || payingFineId === record.id"
+                      (click)="payFine(record)">
+                {{ payingFineId === record.id ? 'Paying...' : 'Pay Fine' }}
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="returnRecords.length === 0">
+            <td colspan="7" class="text-center text-muted">No return records available</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

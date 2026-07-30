@@ -1,0 +1,163 @@
+package com.library.dto;
+
+import jakarta.validation.constraints.*;
+
+/**
+ * DTO for creating a new book.
+ */
+public class CreateBookRequest {
+
+    @NotBlank(message = "Book title is required")
+    @Size(min = 1, max = 255, message = "Title must be between 1 and 255 characters")
+    private String title;
+
+    @NotBlank(message = "Author is required")
+    @Size(min = 1, max = 255, message = "Author must be between 1 and 255 characters")
+    private String author;
+
+    @Size(max = 50, message = "ISBN must be at most 50 characters")
+    private String isbn;
+
+    @NotNull(message = "Category ID is required")
+    private Long categoryId;
+
+    @Size(max = 255, message = "Publisher must be at most 255 characters")
+    private String publisher;
+
+    @Min(value = 1000, message = "Publication year must be 1000 or later")
+    @Max(value = 2100, message = "Publication year must be 2100 or earlier")
+    private Integer publicationYear;
+
+    @Size(max = 5000, message = "Description must be at most 5000 characters")
+    private String description;
+
+    @Size(max = 50, message = "Language must be at most 50 characters")
+    private String language;
+
+    @Size(max = 255, message = "Shelf location must be at most 255 characters")
+    private String shelfLocation;
+
+    @NotNull(message = "Total copies is required")
+    @Min(value = 1, message = "Total copies must be at least 1")
+    private Integer totalCopies;
+
+    @Min(value = 0, message = "Available copies cannot be negative")
+    private Integer availableCopies;
+
+    @Size(max = 500, message = "Cover image URL must be at most 500 characters")
+    private String coverImageUrl;
+
+    /**
+     * Constructors
+     */
+    public CreateBookRequest() {
+    }
+
+    public CreateBookRequest(String title, String author, Long categoryId) {
+        this.title = title;
+        this.author = author;
+        this.categoryId = categoryId;
+        this.totalCopies = 1;
+        this.availableCopies = 1;
+    }
+
+    /**
+     * Getters and Setters
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public Integer getPublicationYear() {
+        return publicationYear;
+    }
+
+    public void setPublicationYear(Integer publicationYear) {
+        this.publicationYear = publicationYear;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getShelfLocation() {
+        return shelfLocation;
+    }
+
+    public void setShelfLocation(String shelfLocation) {
+        this.shelfLocation = shelfLocation;
+    }
+
+    public Integer getTotalCopies() {
+        return totalCopies;
+    }
+
+    public void setTotalCopies(Integer totalCopies) {
+        this.totalCopies = totalCopies;
+    }
+
+    public Integer getAvailableCopies() {
+        return availableCopies;
+    }
+
+    public void setAvailableCopies(Integer availableCopies) {
+        this.availableCopies = availableCopies;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
+    }
+
+}

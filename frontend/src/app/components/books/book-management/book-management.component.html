@@ -1,0 +1,140 @@
+<div class="container-main">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Book Management</h1>
+      <p class="lead mb-0">Catalog controls for admin and librarian personas.</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">Add Book</button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ success }}
+    <button type="button" class="btn-close" (click)="success = ''"></button>
+  </div>
+
+  <div *ngIf="showForm" class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">{{ editingBook ? 'Edit Book' : 'Add Book' }}</h5>
+      <button type="button" class="btn-close" (click)="closeForm()"></button>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Title</label>
+            <input class="form-control" formControlName="title" />
+            <small class="text-danger" *ngIf="f['title'].touched && f['title'].invalid">Title is required.</small>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Author</label>
+            <input class="form-control" formControlName="author" />
+            <small class="text-danger" *ngIf="f['author'].touched && f['author'].invalid">Author is required.</small>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Category</label>
+            <select class="form-select" formControlName="categoryId">
+              <option [ngValue]="null">Select Category</option>
+              <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+            </select>
+            <small class="text-danger" *ngIf="f['categoryId'].touched && f['categoryId'].invalid">Category is required.</small>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Total Copies</label>
+            <input type="number" class="form-control" formControlName="totalCopies" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Available Copies</label>
+            <input type="number" class="form-control" formControlName="availableCopies" />
+            <small class="text-danger" *ngIf="(f['availableCopies'].touched || f['totalCopies'].touched) && form.errors?.['availableExceedsTotal']">
+              Available copies cannot be greater than total copies.
+            </small>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">ISBN</label>
+            <input class="form-control" formControlName="isbn" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Publisher</label>
+            <input class="form-control" formControlName="publisher" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Publication Year</label>
+            <input type="number" class="form-control" formControlName="publicationYear" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Language</label>
+            <input class="form-control" formControlName="language" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Shelf Location</label>
+            <input class="form-control" formControlName="shelfLocation" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cover URL</label>
+            <input class="form-control" formControlName="coverImageUrl" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea rows="3" class="form-control" formControlName="description"></textarea>
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="saving">{{ saving ? 'Saving...' : 'Save' }}</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Catalog ({{ books.length }})</h5>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="p-4 text-center">
+        <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Category</th>
+              <th>Available</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let book of books">
+              <td>{{ book.title }}</td>
+              <td>{{ book.author }}</td>
+              <td>{{ book.category?.name || '-' }}</td>
+              <td>{{ book.availableCopies }} / {{ book.totalCopies }}</td>
+              <td>{{ book.status }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-primary" (click)="openEditForm(book)">Edit</button>
+                  <button class="btn btn-outline-danger" [disabled]="deletingId === book.id" (click)="removeBook(book)">
+                    {{ deletingId === book.id ? 'Deleting...' : 'Delete' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="books.length === 0">
+              <td colspan="6" class="text-center py-4 text-muted">No books found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

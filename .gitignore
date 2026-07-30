@@ -1,0 +1,80 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Build
+target/
+build/
+dist/
+*.jar
+*.war
+*.ear
+*.zip
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Gradle
+.gradle/
+gradle/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Coverage
+coverage/
+.coverage
+htmlcov/
+target/site/
+
+# OS
+Thumbs.db
+.thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# IDE specific
+.project
+.classpath
+.settings/
+.springBeans
+*.swp
+.factorypath
+
+# STS
+.sts4-cache/
+
+# User preferences
+.editorconfig

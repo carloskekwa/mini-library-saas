@@ -1,0 +1,236 @@
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { User } from '../../../models/index';
+import { UserAdminService } from '../../../services/user-admin.service';
+
+@Component({
+  selector: 'app-user-console',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
+  template: `
+    <div class="container-main">
+      <h1>User Console</h1>
+      <p class="lead">Search users, update account status, and open moderation workflows.</p>
+
+      <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">Search</label>
+              <input class="form-control" [(ngModel)]="search" placeholder="username or email" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Status</label>
+              <select class="form-select" [(ngModel)]="statusFilter">
+                <option value="">All</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+                <option value="SUSPENDED">SUSPENDED</option>
+              </select>
+            </div>
+            <div class="col-md-5 d-flex gap-2">
+              <button class="btn btn-primary" (click)="applyFilters()">Apply</button>
+              <button class="btn btn-outline-secondary" (click)="clearFilters()">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Roles</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of users" [class.table-active]="selectedUserId === user.id">
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.email }}</td>
+                  <td><span class="badge" [class]="'bg-' + (user.status === 'ACTIVE' ? 'success' : (user.status === 'SUSPENDED' ? 'danger' : 'secondary'))">{{ user.status }}</span></td>
+                  <td>{{ user.roles.join(', ') }}</td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary" (click)="selectUser(user)">Select</button>
+                      <button class="btn btn-outline-success" [disabled]="user.status === 'ACTIVE'" (click)="setStatus(user, 'ACTIVE')">Activate</button>
+                      <button class="btn btn-outline-warning" [disabled]="user.status === 'INACTIVE'" (click)="setStatus(user, 'INACTIVE')">Inactivate</button>
+                      <button class="btn btn-outline-danger" [disabled]="user.status === 'SUSPENDED'" (click)="setStatus(user, 'SUSPENDED')">Suspend</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="!loading && users.length === 0">
+                  <td colspan="6" class="text-center text-muted py-4">No users found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="totalPages > 1">
+            <button class="btn btn-sm btn-outline-primary" [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">Previous</button>
+            <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
+            <button class="btn btn-sm btn-outline-primary" [disabled]="currentPage + 1 >= totalPages" (click)="changePage(currentPage + 1)">Next</button>
+          </div>
+
+          <div class="row g-3 align-items-end mt-2">
+            <div class="col-md-4">
+              <label class="form-label">Selected User ID</label>
+              <input type="number" class="form-control" [(ngModel)]="selectedUserId" placeholder="Select from table or type ID" />
+            </div>
+            <div class="col-md-8 d-flex gap-2">
+              <button class="btn btn-primary" (click)="openPenalties()">Open Penalties</button>
+              <button class="btn btn-outline-primary" (click)="openAudit()">Open Audit Logs</button>
+              <button class="btn btn-outline-secondary" (click)="openBookRequests()">Open Book Requests</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [
+    'h1 { color: #0d47a1; font-weight: 700; }',
+    '.lead { color: #5f6b7a; }',
+    '.card { border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }'
+  ]
+})
+export class UserConsoleComponent implements OnInit, OnDestroy {
+  users: User[] = [];
+  selectedUserId: number | null = null;
+  search = '';
+  statusFilter = '';
+  currentPage = 0;
+  pageSize = 20;
+  totalElements = 0;
+  loading = false;
+  error = '';
+  successMessage = '';
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly userAdminService: UserAdminService
+  ) {}
+
+  ngOnInit(): void {
+    const query = this.route.snapshot.queryParams;
+    this.search = query['search'] || '';
+    this.statusFilter = query['status'] || '';
+    this.currentPage = Number(query['page'] || 0);
+    this.selectedUserId = query['userId'] ? Number(query['userId']) : null;
+    this.loadUsers();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadUsers(): void {
+    this.loading = true;
+    this.error = '';
+    this.userAdminService.getUsers({
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      search: this.search,
+      status: this.statusFilter
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        this.users = response.content || [];
+        this.totalElements = response.totalElements || this.users.length;
+        this.loading = false;
+        this.syncUrl();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err.error?.message || 'Failed to load users';
+      }
+    });
+  }
+
+  applyFilters(): void {
+    this.currentPage = 0;
+    this.loadUsers();
+  }
+
+  clearFilters(): void {
+    this.search = '';
+    this.statusFilter = '';
+    this.currentPage = 0;
+    this.loadUsers();
+  }
+
+  changePage(page: number): void {
+    this.currentPage = page;
+    this.loadUsers();
+  }
+
+  setStatus(user: User, status: string): void {
+    this.userAdminService.updateUserStatus(user.id, status)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.successMessage = `Updated ${user.username} to ${status}`;
+          this.loadUsers();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (err) => {
+          this.error = err.error?.message || 'Failed to update user status';
+        }
+      });
+  }
+
+  openPenalties(): void {
+    if (!this.selectedUserId) {
+      return;
+    }
+    this.router.navigate(['/admin/penalties'], { queryParams: { userId: this.selectedUserId } });
+  }
+
+  openAudit(): void {
+    if (!this.selectedUserId) {
+      return;
+    }
+    this.router.navigate(['/admin/audit-logs'], { queryParams: { mode: 'user', userId: this.selectedUserId } });
+  }
+
+  openBookRequests(): void {
+    this.router.navigate(['/book-requests']);
+  }
+
+  selectUser(user: User): void {
+    this.selectedUserId = user.id;
+    this.syncUrl();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalElements / this.pageSize);
+  }
+
+  private syncUrl(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.currentPage || null,
+        search: this.search || null,
+        status: this.statusFilter || null,
+        userId: this.selectedUserId || null
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+}

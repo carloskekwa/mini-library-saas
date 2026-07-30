@@ -1,0 +1,104 @@
+<div class="container-main">
+  <h1>Book Requests</h1>
+  <p class="lead">Request new titles and track processing status.</p>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Create Request</h5></div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Book Title</label>
+          <input class="form-control" [(ngModel)]="bookTitle" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Author</label>
+          <input class="form-control" [(ngModel)]="author" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">ISBN (optional)</label>
+          <input class="form-control" [(ngModel)]="isbn" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Justification (optional)</label>
+          <input class="form-control" [(ngModel)]="justification" />
+        </div>
+      </div>
+      <button class="btn btn-primary mt-3" (click)="createRequest()">Submit Request</button>
+    </div>
+  </div>
+
+  <div class="card mb-4" *ngIf="canModerate">
+    <div class="card-header"><h5 class="mb-0">Pending Requests (Staff View)</h5></div>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Requested</th>
+            <th>Status</th>
+            <th *ngIf="canApproveReject" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of pendingRequests">
+            <td>{{ request.bookTitle }}</td>
+            <td>{{ request.author }}</td>
+            <td>{{ request.isbn || '-' }}</td>
+            <td>{{ request.requestedAt | date: 'short' }}</td>
+            <td>{{ request.status }}</td>
+            <td *ngIf="canApproveReject" class="text-end">
+              <button class="btn btn-sm btn-success" (click)="approve(request)">Approve</button>
+              <button class="btn btn-sm btn-outline-danger ms-2" (click)="reject(request)">Reject</button>
+            </td>
+          </tr>
+          <tr *ngIf="pendingRequests.length === 0">
+            <td [attr.colspan]="canApproveReject ? 6 : 5" class="text-center text-muted py-4">No pending requests.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h5 class="mb-0">My Requests</h5></div>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Requested</th>
+            <th>Status</th>
+            <th>Processed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of userRequests">
+            <td>{{ request.bookTitle }}</td>
+            <td>{{ request.author }}</td>
+            <td>{{ request.isbn || '-' }}</td>
+            <td>{{ request.requestedAt | date: 'short' }}</td>
+            <td>{{ request.status }}</td>
+            <td>{{ request.processedAt ? (request.processedAt | date: 'short') : '-' }}</td>
+          </tr>
+          <tr *ngIf="!loading && userRequests.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">No requests submitted yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

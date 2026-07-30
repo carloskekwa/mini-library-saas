@@ -1,0 +1,48 @@
+version: '3.9'
+
+# Docker Compose for Integration Testing
+# Runs tests inside a Docker container with MySQL
+# Usage: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
+services:
+  # MySQL Database for Tests
+  test-db:
+    image: mysql:8.0-debian
+    container_name: library-test-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_test_password
+      MYSQL_DATABASE: library_test_db
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_test_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - library-test-network
+
+  # Test Runner Container
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: library-test-runner
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://test-db:3306/library_test_db
+      SPRING_DATASOURCE_USERNAME: test_user
+      SPRING_DATASOURCE_PASSWORD: test_password
+      SPRING_PROFILES_ACTIVE: test
+      MYSQL_ROOT_PASSWORD: root_test_password
+    depends_on:
+      test-db:
+        condition: service_healthy
+    networks:
+      - library-test-network
+    volumes:
+      - ./target:/app/target
+    command: mvn clean test
+
+networks:
+  library-test-network:
+    driver: bridge

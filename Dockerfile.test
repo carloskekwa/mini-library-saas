@@ -1,0 +1,11 @@
+# Dockerfile for running tests inside Docker
+FROM maven:3.9.5-eclipse-temurin-21
+
+WORKDIR /app
+
+# Copy project files
+COPY pom.xml .
+COPY src ./src
+
+# Run tests (default command)
+CMD ["mvn", "clean", "test", "-DskipITs=false"]

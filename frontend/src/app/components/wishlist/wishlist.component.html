@@ -1,0 +1,51 @@
+<div class="container-main">
+  <h1>My Wishlist</h1>
+  <p class="lead">Books saved for later borrowing.</p>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>Added</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of wishlist">
+            <td>
+              <div class="book-cell">
+                <span class="book-letter-cover">{{ getBookCoverLetter(item.bookTitle) }}</span>
+                <a [routerLink]="['/books', item.bookId]">{{ item.bookTitle }}</a>
+              </div>
+            </td>
+            <td>{{ item.addedAt | date: 'short' }}</td>
+            <td class="text-end">
+              <button class="btn btn-outline-danger btn-sm" [disabled]="deletingId === item.id" (click)="remove(item)">
+                {{ deletingId === item.id ? 'Removing...' : 'Remove' }}
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="wishlist.length === 0">
+            <td colspan="3" class="text-center text-muted py-4">No wishlist items yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

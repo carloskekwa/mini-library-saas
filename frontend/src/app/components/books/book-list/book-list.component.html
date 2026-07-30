@@ -1,0 +1,142 @@
+<div class="container-main">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1>Books</h1>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div class="search-section mb-4">
+    <div class="row g-2">
+      <div class="col-md-5">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search books by title..."
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearchTriggered()"
+          />
+          <button class="btn btn-primary" (click)="onSearchTriggered()">
+            <i class="bi bi-search"></i> Search
+          </button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select" [(ngModel)]="selectedCategoryId" (change)="onCategoryChange()">
+          <option [ngValue]="null">All Categories</option>
+          <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-secondary w-100" (click)="resetSearch()">
+          <i class="bi bi-arrow-clockwise"></i> Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && books.length === 0" class="alert alert-info">
+    No books found.
+  </div>
+
+  <div class="row">
+    <div *ngFor="let book of books" class="col-md-4 col-lg-3 mb-4">
+      <div class="card book-card h-100">
+        <div class="book-cover">
+          <img
+            *ngIf="book.coverImageUrl"
+            [src]="book.coverImageUrl"
+            alt="{{ book.title }}"
+            class="card-img-top"
+          />
+          <div *ngIf="!book.coverImageUrl" class="placeholder-cover">
+            <span class="cover-letter">{{ getBookCoverLetter(book.title) }}</span>
+          </div>
+        </div>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ book.title }}</h5>
+          <p class="card-text text-muted">{{ book.author }}</p>
+          <p class="card-text small">
+            <strong>ISBN:</strong> {{ book.isbn }}
+          </p>
+          <p class="card-text small">
+            <strong>Category:</strong> {{ book.category?.name }}
+          </p>
+          <div class="badge mb-2">
+            <span [class]="'badge bg-' + (book.availableCopies > 0 ? 'success' : 'danger')">
+              {{ book.availableCopies }} / {{ book.totalCopies }} Available
+            </span>
+          </div>
+          <div class="mt-auto">
+            <button
+              class="btn btn-primary btn-sm w-100 mb-2"
+              [disabled]="book.availableCopies === 0"
+              (click)="borrowBook(book)"
+            >
+              Borrow
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-sm w-100 mb-2"
+              (click)="reserveBook(book)"
+            >
+              Reserve
+            </button>
+            <button
+              class="btn btn-outline-dark btn-sm w-100 mb-2"
+              (click)="addToWishlist(book)"
+            >
+              Add to Wishlist
+            </button>
+            <a [routerLink]="['/books', book.id]" class="btn btn-outline-primary btn-sm w-100">
+              View Details
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav *ngIf="totalPages > 1" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="goToPage(0)" [disabled]="currentPage === 0">
+          First
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">
+          Previous
+        </button>
+      </li>
+      <li *ngFor="let page of pages" class="page-item" [class.active]="currentPage === page">
+        <button class="page-link" (click)="goToPage(page)">{{ page + 1 }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+        <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages - 1">
+          Next
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+        <button class="page-link" (click)="goToPage(totalPages - 1)" [disabled]="currentPage === totalPages - 1">
+          Last
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

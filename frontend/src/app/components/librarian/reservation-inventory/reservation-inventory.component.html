@@ -1,0 +1,96 @@
+<div class="container-main">
+  <h1>Reservation Inventory</h1>
+  <p class="lead">All reservations across members — fulfill into borrowing, cancel, and track queue positions.</p>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Search</label>
+          <input class="form-control" [(ngModel)]="searchTerm" placeholder="Book title or username" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="statusFilter">
+            <option value="">All</option>
+            <option value="PENDING">PENDING</option>
+            <option value="NOTIFIED">NOTIFIED</option>
+            <option value="FULFILLED">FULFILLED</option>
+            <option value="CANCELLED">CANCELLED</option>
+            <option value="EXPIRED">EXPIRED</option>
+          </select>
+        </div>
+        <div class="col-md-5 d-flex gap-2">
+          <button class="btn btn-primary" (click)="applyFilters()">Apply</button>
+          <button class="btn btn-outline-secondary" (click)="clearFilters()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border" role="status"><span class="visually-hidden">Loading…</span></div>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>Member</th>
+            <th>Reserved On</th>
+            <th>Expires</th>
+            <th>Queue #</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filteredRecords">
+            <td>{{ r.bookTitle || r.book.title }}</td>
+            <td>{{ r.username || ('User #' + r.userId) }}</td>
+            <td>{{ r.reservationDate | date: 'short' }}</td>
+            <td>
+              <span [class]="getDaysUntilExpiry(r.expiryDate) <= 3 ? 'text-danger fw-bold' : ''">
+                {{ getDaysUntilExpiry(r.expiryDate) }} days
+              </span>
+            </td>
+            <td>#{{ r.positionInQueue }}</td>
+            <td><span class="badge" [ngClass]="getStatusBadgeClass(r.status)">{{ r.status }}</span></td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-success me-1"
+                [disabled]="processingId === r.id || r.status === 'FULFILLED' || r.status === 'CANCELLED' || r.status === 'EXPIRED'"
+                (click)="fulfill(r)">
+                {{ processingId === r.id ? '…' : 'Fulfill & Borrow' }}
+              </button>
+              <button class="btn btn-sm btn-outline-danger"
+                [disabled]="processingId === r.id || r.status === 'FULFILLED' || r.status === 'CANCELLED' || r.status === 'EXPIRED'"
+                (click)="cancel(r)">
+                Cancel
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredRecords.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">No reservations found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="totalPages > 1">
+    <button class="btn btn-sm btn-outline-primary" [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">Previous</button>
+    <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button class="btn btn-sm btn-outline-primary" [disabled]="currentPage + 1 >= totalPages" (click)="changePage(currentPage + 1)">Next</button>
+  </div>
+</div>

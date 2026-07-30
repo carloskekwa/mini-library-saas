@@ -1,0 +1,110 @@
+<div class="container-main">
+  <h1>My Reservations</h1>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div *ngFor="let reservation of reservations" class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="book-letter-cover mb-3">{{ getBookCoverLetter(reservation.book.title) }}</div>
+          <h5 class="card-title">{{ reservation.book.title }}</h5>
+          <p class="card-text text-muted">{{ reservation.book.author }}</p>
+
+          <p class="card-text">
+            <strong>Position in Queue:</strong> #{{ reservation.positionInQueue }}
+          </p>
+
+          <p class="card-text">
+            <strong>Reserved on:</strong> {{ reservation.reservationDate | date: 'short' }}
+          </p>
+
+          <p class="card-text">
+            <strong>Expires in:</strong>
+            <span [class]="'badge bg-' + (getDaysUntilExpiry(reservation.expiryDate) <= 3 ? 'warning' : 'info')">
+              {{ getDaysUntilExpiry(reservation.expiryDate) }} days
+            </span>
+          </p>
+
+          <p class="card-text">
+            <strong>Status:</strong>
+            <span class="badge bg-primary">{{ reservation.status }}</span>
+          </p>
+
+          <button
+            class="btn btn-danger btn-sm w-100"
+            (click)="cancelReservation(reservation)"
+          >
+            Cancel Reservation
+          </button>
+
+          <button
+            *ngIf="canManageQueue"
+            class="btn btn-outline-primary btn-sm w-100 mt-2"
+            (click)="viewQueue(reservation.book.id)"
+          >
+            View Queue
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && reservations.length === 0" class="alert alert-info w-100">
+      You have no active reservations
+    </div>
+  </div>
+
+  <div class="card mt-4" *ngIf="canManageQueue && selectedBookId">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Reservation Queue for Book #{{ selectedBookId }}</h5>
+    </div>
+    <div class="card-body" *ngIf="loadingQueue">
+      <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+    </div>
+    <div class="table-responsive" *ngIf="!loadingQueue">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Reserved</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let queueItem of queueReservations">
+            <td>User #{{ queueItem.userId }}</td>
+            <td>{{ queueItem.reservationDate | date: 'short' }}</td>
+            <td>#{{ queueItem.positionInQueue }}</td>
+            <td>{{ queueItem.status }}</td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-success"
+                      [disabled]="queueItem.status !== 'PENDING'"
+                      (click)="fulfillReservation(queueItem)">
+                Fulfill
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="queueReservations.length === 0">
+            <td colspan="5" class="text-center text-muted">No queue entries for this book.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

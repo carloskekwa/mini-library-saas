@@ -1,0 +1,101 @@
+<div class="container-main">
+  <h1>Borrowed Inventory</h1>
+  <p class="lead">Librarian view of currently borrowed books and who took them.</p>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search by book title, author, or username"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilter()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>Author</th>
+            <th>Borrowed By</th>
+            <th>Borrowed Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Inventory</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of filteredRecords">
+            <td>{{ record.bookTitle || record.book.title }}</td>
+            <td>{{ record.bookAuthor || record.book.author }}</td>
+            <td>{{ record.username || ('User #' + record.userId) }}</td>
+            <td>{{ record.borrowDate | date: 'short' }}</td>
+            <td>{{ record.dueDate | date: 'short' }}</td>
+            <td>
+              <span class="badge" [class]="record.status === 'OVERDUE' ? 'bg-danger' : 'bg-primary'">
+                {{ record.status }}
+              </span>
+            </td>
+            <td>
+              {{ getBorrowedCount(record) }} borrowed / {{ getTotalCopies(record) }} total
+              <div class="small text-muted">
+                {{ getAvailableCopies(record) }} available now
+              </div>
+            </td>
+            <td>
+              <select class="form-select form-select-sm mb-1" [(ngModel)]="selectedCondition[record.id]">
+                <option value="GOOD">GOOD</option>
+                <option value="EXCELLENT">EXCELLENT</option>
+                <option value="FAIR">FAIR</option>
+                <option value="POOR">POOR</option>
+                <option value="DAMAGED">DAMAGED</option>
+              </select>
+              <input class="form-control form-control-sm mb-1" placeholder="Damage notes (optional)" [(ngModel)]="damageNotes[record.id]" />
+              <button class="btn btn-sm btn-primary" [disabled]="processingId === record.id || record.renewalCount >= 3" (click)="renewRecord(record)">
+                {{ processingId === record.id ? 'Processing...' : 'Renew' }}
+              </button>
+              <button class="btn btn-sm btn-danger ms-1" [disabled]="processingId === record.id" (click)="returnRecord(record)">
+                Return
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredRecords.length === 0">
+            <td colspan="8" class="text-center text-muted py-4">No borrowed records found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="totalPages > 1">
+    <button class="btn btn-sm btn-outline-primary" [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">
+      Previous
+    </button>
+    <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button class="btn btn-sm btn-outline-primary" [disabled]="currentPage + 1 >= totalPages" (click)="changePage(currentPage + 1)">
+      Next
+    </button>
+  </div>
+</div>

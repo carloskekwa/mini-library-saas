@@ -1,0 +1,134 @@
+<div class="container-main" *ngIf="book">
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="book-cover-large">
+        <img
+          *ngIf="book.coverImageUrl"
+          [src]="book.coverImageUrl"
+          alt="{{ book.title }}"
+        />
+        <div *ngIf="!book.coverImageUrl" class="placeholder-cover">
+          <span class="cover-letter">{{ getBookCoverLetter(book.title) }}</span>
+        </div>
+      </div>
+      <button class="btn btn-primary w-100 mt-3" [disabled]="book.availableCopies === 0" (click)="borrowBook()">
+        {{ book.availableCopies > 0 ? 'Borrow Book' : 'Not Available' }}
+      </button>
+      <button class="btn btn-outline-secondary w-100 mt-2" (click)="reserveBook()">
+        Reserve Book
+      </button>
+      <button class="btn btn-outline-dark w-100 mt-2" (click)="addToWishlist()">
+        Add to Wishlist
+      </button>
+    </div>
+
+    <div class="col-md-8">
+      <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <h1>{{ book.title }}</h1>
+      <p class="lead">{{ book.author }}</p>
+
+      <div class="book-info">
+        <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+        <p><strong>Category:</strong> {{ book.category?.name }}</p>
+        <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+        <p><strong>Publication Year:</strong> {{ book.publicationYear }}</p>
+        <p><strong>Language:</strong> {{ book.language }}</p>
+        <p><strong>Location:</strong> {{ book.shelfLocation }}</p>
+        <p>
+          <strong>Available Copies:</strong>
+          <span [class]="'badge bg-' + (book.availableCopies > 0 ? 'success' : 'danger')">
+            {{ book.availableCopies }} / {{ book.totalCopies }}
+          </span>
+        </p>
+      </div>
+
+      <div class="book-description">
+        <h5>Description</h5>
+        <p>{{ book.description }}</p>
+      </div>
+
+      <div class="book-rating">
+        <h5>Average Rating</h5>
+        <div class="rating">
+          <div class="stars">
+            <span *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= Math.ceil(averageRating)">
+              ★
+            </span>
+          </div>
+          <span class="ms-2">{{ averageRating.toFixed(1) }} / 5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-md-8">
+      <h3>Reviews ({{ reviews.length }})</h3>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Write a Review</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating</label>
+              <select id="rating" class="form-select" formControlName="rating">
+                <option value="1">1 - Poor</option>
+                <option value="2">2 - Fair</option>
+                <option value="3">3 - Good</option>
+                <option value="4">4 - Very Good</option>
+                <option value="5">5 - Excellent</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="reviewText" class="form-label">Review</label>
+              <textarea
+                id="reviewText"
+                class="form-control"
+                rows="4"
+                formControlName="reviewText"
+                placeholder="Write your review here..."
+              ></textarea>
+              <small class="form-text text-muted">
+                Characters: {{ f['reviewText'].value?.length || 0 }} / 1000
+              </small>
+            </div>
+            <button type="submit" class="btn btn-primary" [disabled]="reviewForm.invalid">
+              Submit Review
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div *ngFor="let review of reviews" class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6>User #{{ review.userId }}</h6>
+              <div class="rating-small">
+                <span *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= review.rating">★</span>
+              </div>
+            </div>
+            <small class="text-muted">{{ review.createdAt | date: 'short' }}</small>
+          </div>
+          <p class="mt-2">{{ review.reviewText }}</p>
+          <small class="text-muted">{{ review.helpfulCount }} people found this helpful</small>
+          <div class="mt-2" *ngIf="canDeleteReview(review)">
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteReview(review)">Delete Review</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-main" *ngIf="loading">
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>

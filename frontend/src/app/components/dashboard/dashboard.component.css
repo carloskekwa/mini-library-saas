@@ -1,0 +1,46 @@
+h1 {
+  color: #0d47a1;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.lead {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card h2 {
+  font-weight: 700;
+  margin: 10px 0 0 0;
+}
+
+.stat-card h6 {
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #0d47a1;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}

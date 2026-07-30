@@ -1,0 +1,50 @@
+<div class="container-main">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Notifications</h1>
+    <button class="btn btn-outline-primary" (click)="markAllAsRead()">
+      Mark All as Read
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngFor="let notification of notifications" [class]="'notification-card ' + (notification.isRead ? 'read' : 'unread')">
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="notification-content">
+        <h6 class="notification-title">{{ notification.title }}</h6>
+        <p class="notification-message">{{ notification.message }}</p>
+        <small class="text-muted">{{ notification.createdAt | date: 'short' }}</small>
+      </div>
+      <div class="notification-actions">
+        <button
+          class="btn btn-sm btn-primary"
+          (click)="markAsRead(notification)"
+          [disabled]="notification.isRead"
+        >
+          {{ notification.isRead ? 'Read' : 'Mark as Read' }}
+        </button>
+        <button class="btn btn-sm btn-danger ms-2" (click)="deleteNotification(notification)">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && notifications.length === 0" class="alert alert-info">
+    No unread notifications
+  </div>
+</div>

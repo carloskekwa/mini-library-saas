@@ -1,0 +1,31 @@
+.container {
+  max-width: 700px;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+}
+
+.btn-primary {
+  background-color: #0d47a1;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1565c0;
+}
+
+a {
+  color: #0d47a1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

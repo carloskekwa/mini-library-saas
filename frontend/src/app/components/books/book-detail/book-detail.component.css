@@ -1,0 +1,94 @@
+h1 {
+  color: #0d47a1;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.lead {
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.book-cover-large {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-cover-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #0d47a1, #1e88e5);
+  color: #fff;
+}
+
+.cover-letter {
+  font-size: 7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.book-info {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.book-info p {
+  margin-bottom: 10px;
+}
+
+.book-description {
+  margin-top: 30px;
+  line-height: 1.6;
+}
+
+.book-rating {
+  margin-top: 20px;
+}
+
+.stars {
+  font-size: 1.5rem;
+  color: #ddd;
+}
+
+.stars span.filled {
+  color: #ffc107;
+}
+
+.rating-small {
+  font-size: 1rem;
+  color: #ddd;
+}
+
+.rating-small span.filled {
+  color: #ffc107;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #0d47a1;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1565c0;
+}

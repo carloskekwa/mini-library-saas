@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+.project
+.classpath
+.settings
+
+# Build artifacts
+target/
+build/
+dist/
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn
+mvnw
+mvnw.cmd
+
+# Documentation
+docs/
+README.md
+LICENSE
+
+# Node
+node_modules/
+npm-debug.log
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+
+# Tests
+src/test

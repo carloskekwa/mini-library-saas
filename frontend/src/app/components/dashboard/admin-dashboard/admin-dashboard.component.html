@@ -1,0 +1,21 @@
+<div class="container-main role-dashboard">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p class="lead mb-0">System-level controls and operational shortcuts.</p>
+    </div>
+    <span class="badge text-bg-primary fs-6">ADMIN</span>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4" *ngFor="let card of cards">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ card.title }}</h5>
+          <p class="card-text text-muted">{{ card.description }}</p>
+          <a class="btn btn-primary mt-auto" [routerLink]="card.route">{{ card.action }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

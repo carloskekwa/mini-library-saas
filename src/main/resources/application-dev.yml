@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:library_db}
+    username: ${DB_USER:library_user}
+    password: ${DB_PASSWORD:library_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  mail:
+    host: ${MAIL_HOST:mailhog}
+    port: ${MAIL_PORT:1025}
+
+logging:
+  level:
+    root: INFO
+    com.library: INFO
+  file:
+    name: logs/application-dev.log
