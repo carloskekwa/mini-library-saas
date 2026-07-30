@@ -38,33 +38,52 @@
   </div>
 
   <div class="card mb-4" *ngIf="canModerate">
-    <div class="card-header"><h5 class="mb-0">Pending Requests (Staff View)</h5></div>
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <h5 class="mb-0">All Requests (Staff View)</h5>
+      <div class="d-flex align-items-center gap-2">
+        <label class="form-label mb-0" for="staff-status-filter">Status</label>
+        <select id="staff-status-filter" class="form-select form-select-sm" style="width: 180px;" [(ngModel)]="selectedStaffStatus">
+          <option *ngFor="let statusOption of staffStatusOptions" [value]="statusOption">{{ statusOption }}</option>
+        </select>
+      </div>
+    </div>
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
           <tr>
+            <th>ID</th>
+            <th>Requester</th>
+            <th>Email</th>
             <th>Title</th>
             <th>Author</th>
             <th>ISBN</th>
+            <th>Justification</th>
             <th>Requested</th>
             <th>Status</th>
-            <th *ngIf="canApproveReject" class="text-end">Actions</th>
+            <th>Processed</th>
+            <th class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let request of pendingRequests">
+          <tr *ngFor="let request of filteredStaffRequests">
+            <td>#{{ request.id }}</td>
+            <td>{{ request.username || request.userId }}</td>
+            <td>{{ request.userEmail || '-' }}</td>
             <td>{{ request.bookTitle }}</td>
             <td>{{ request.author }}</td>
             <td>{{ request.isbn || '-' }}</td>
+            <td>{{ request.justification || '-' }}</td>
             <td>{{ request.requestedAt | date: 'short' }}</td>
             <td>{{ request.status }}</td>
-            <td *ngIf="canApproveReject" class="text-end">
-              <button class="btn btn-sm btn-success" (click)="approve(request)">Approve</button>
-              <button class="btn btn-sm btn-outline-danger ms-2" (click)="reject(request)">Reject</button>
+            <td>{{ request.processedAt ? (request.processedAt | date: 'short') : '-' }}</td>
+            <td class="text-end">
+              <button *ngIf="canApproveReject && request.status === 'PENDING'" class="btn btn-sm btn-success" (click)="approve(request)">Approve</button>
+              <button *ngIf="canApproveReject && request.status === 'PENDING'" class="btn btn-sm btn-outline-danger ms-2" (click)="reject(request)">Reject</button>
+              <button *ngIf="canOrder(request)" class="btn btn-sm btn-primary ms-2" (click)="order(request)">Order</button>
             </td>
           </tr>
-          <tr *ngIf="pendingRequests.length === 0">
-            <td [attr.colspan]="canApproveReject ? 6 : 5" class="text-center text-muted py-4">No pending requests.</td>
+          <tr *ngIf="filteredStaffRequests.length === 0">
+            <td colspan="11" class="text-center text-muted py-4">No requests available.</td>
           </tr>
         </tbody>
       </table>

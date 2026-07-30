@@ -8,13 +8,6 @@
       </span>
     </a>
 
-    <div class="topbar-center" *ngIf="isLoggedIn">
-      <div class="search-pill">
-        <i class="bi bi-search"></i>
-        <span>Search books, members, reports</span>
-      </div>
-    </div>
-
     <div class="topbar-actions">
       <a *ngIf="isLoggedIn && canSeeNotificationsMenu" class="icon-chip" routerLink="/notifications" routerLinkActive="active-pill" [routerLinkActiveOptions]="{ exact: true }" (click)="updateNotificationCount()">
         <i class="bi bi-bell"></i>
@@ -61,9 +54,7 @@
       <section *ngIf="isAdmin">
         <h6>Admin Studio</h6>
         <a routerLink="/reports" routerLinkActive="active"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
-        <a routerLink="/operations/batch-import" routerLinkActive="active"><i class="bi bi-upload"></i><span>Batch Import</span></a>
         <a routerLink="/admin/users" routerLinkActive="active"><i class="bi bi-people"></i><span>User Console</span></a>
-        <a routerLink="/admin/audit-logs" routerLinkActive="active"><i class="bi bi-shield-check"></i><span>Audit Logs</span></a>
         <a routerLink="/admin/config" routerLinkActive="active"><i class="bi bi-sliders"></i><span>System Config</span></a>
         <a routerLink="/admin/email-templates" routerLinkActive="active"><i class="bi bi-envelope-paper"></i><span>Email Templates</span></a>
         <a routerLink="/admin/scheduled-tasks" routerLinkActive="active"><i class="bi bi-clock-history"></i><span>Scheduled Tasks</span></a>

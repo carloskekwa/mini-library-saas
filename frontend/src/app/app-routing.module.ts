@@ -61,12 +61,6 @@ export const appRoutes: Routes = [
     data: { roles: ['ADMIN', 'LIBRARIAN'] }
   },
   {
-    path: 'admin/audit-logs',
-    loadComponent: () => import('./components/admin/audit-logs/audit-logs.component').then(m => m.AuditLogsComponent),
-    canActivate: [AuthGuard],
-    data: { roles: ['ADMIN'] }
-  },
-  {
     path: 'admin/users',
     loadComponent: () => import('./components/admin/user-console/user-console.component').then(m => m.UserConsoleComponent),
     canActivate: [AuthGuard],

@@ -18,12 +18,6 @@ export class AdminDashboardComponent {
       action: 'Open Reports'
     },
     {
-      title: 'Audit Logs',
-      description: 'Inspect system audit trails.',
-      route: '/admin/audit-logs',
-      action: 'Open Audit'
-    },
-    {
       title: 'User Console',
       description: 'ID-based user moderation and investigation workflows.',
       route: '/admin/users',
@@ -34,12 +28,6 @@ export class AdminDashboardComponent {
       description: 'Manage config, templates, and scheduler.',
       route: '/admin/config',
       action: 'Open Config'
-    },
-    {
-      title: 'Batch Import',
-      description: 'Create and control data import jobs.',
-      route: '/operations/batch-import',
-      action: 'Open Jobs'
     }
   ];
 }

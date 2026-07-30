@@ -119,43 +119,126 @@ span {
 
 .btn {
   border-radius: 999px;
-  font-weight: 700;
+  border: 1px solid rgba(182, 198, 218, 0.9);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+  color: #1f2937;
+  font-weight: 600;
   letter-spacing: 0.01em;
-  transition: all 0.18s ease;
+  min-height: 2.2rem;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px rgba(16, 24, 40, 0.08),
+    0 6px 16px rgba(31, 41, 55, 0.08);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-.btn:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 2px 6px rgba(16, 24, 40, 0.12),
+    0 10px 22px rgba(31, 41, 55, 0.12);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 1px 2px rgba(16, 24, 40, 0.12);
+}
+
+.btn:focus,
+.btn:focus-visible {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px rgba(16, 24, 40, 0.08),
+    0 0 0 3px rgba(0, 122, 255, 0.24);
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.55;
+  transform: none;
+  box-shadow: 0 1px 1px rgba(16, 24, 40, 0.06);
 }
 
 .btn-primary,
 .btn-outline-primary:hover,
 .btn-outline-primary:focus {
-  border-color: #2b75df;
-  background: linear-gradient(145deg, var(--brand-2), var(--brand-1));
-  color: white;
+  border-color: #0b63d1;
+  background: linear-gradient(180deg, #3090ff 0%, #0a74ef 100%);
+  color: #ffffff;
 }
 
 .btn-outline-primary {
-  background: #f7fbff;
-  border-color: #b9d2f1;
-  color: #255f9b;
-}
-
-.btn-danger {
-  border-color: #c32f46;
-  background: linear-gradient(145deg, #dc4860, #c32f46);
-}
-
-.btn-outline-danger {
-  border-color: #e8b7c0;
-  color: #ad2440;
-  background: #fff6f7;
+  border-color: rgba(10, 116, 239, 0.26);
+  background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
+  color: #0b63d1;
 }
 
 .btn-success {
   border-color: #1f8a5f;
-  background: linear-gradient(145deg, #2ea470, #1f8a5f);
+  background: linear-gradient(180deg, #37af79 0%, #1f8a5f 100%);
+  color: #ffffff;
+}
+
+.btn-outline-success {
+  border-color: rgba(31, 138, 95, 0.32);
+  background: linear-gradient(180deg, #ffffff 0%, #f2fbf6 100%);
+  color: #1a7a54;
+}
+
+.btn-danger {
+  border-color: #c32f46;
+  background: linear-gradient(180deg, #e5556e 0%, #cc2f4a 100%);
+  color: #ffffff;
+}
+
+.btn-outline-danger {
+  border-color: rgba(195, 47, 70, 0.3);
+  color: #b72a43;
+  background: linear-gradient(180deg, #ffffff 0%, #fff4f6 100%);
+}
+
+.btn-warning {
+  border-color: #b66907;
+  background: linear-gradient(180deg, #f0a32d 0%, #c98312 100%);
+  color: #ffffff;
+}
+
+.btn-secondary,
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  border-color: #8ca0b8;
+  background: linear-gradient(180deg, #95a8c0 0%, #7f92aa 100%);
+  color: #ffffff;
+}
+
+.btn-outline-secondary {
+  border-color: rgba(127, 146, 170, 0.36);
+  background: linear-gradient(180deg, #ffffff 0%, #f3f6fb 100%);
+  color: #4d647f;
+}
+
+.btn-light {
+  border-color: rgba(181, 197, 216, 0.9);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+  color: #31465e;
+}
+
+.btn-sm {
+  min-height: 1.95rem;
+  padding: 0.35rem 0.8rem;
+}
+
+.btn-lg {
+  min-height: 2.6rem;
+  padding: 0.7rem 1.35rem;
 }
 
 .form-control,

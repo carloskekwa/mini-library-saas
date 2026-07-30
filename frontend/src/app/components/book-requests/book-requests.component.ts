@@ -17,6 +17,8 @@ import { takeUntil } from 'rxjs/operators';
 export class BookRequestsComponent implements OnInit, OnDestroy {
   userRequests: BookRequest[] = [];
   staffRequests: BookRequest[] = [];
+  staffStatusOptions: string[] = ['ALL', 'PENDING', 'APPROVED', 'ORDERED', 'REJECTED', 'FULFILLED'];
+  selectedStaffStatus = 'ALL';
 
   loading = false;
   error = '';
@@ -164,5 +166,12 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
 
   canOrder(request: BookRequest): boolean {
     return this.canModerate && request.status !== 'REJECTED' && request.status !== 'ORDERED' && request.status !== 'FULFILLED';
+  }
+
+  get filteredStaffRequests(): BookRequest[] {
+    if (this.selectedStaffStatus === 'ALL') {
+      return this.staffRequests;
+    }
+    return this.staffRequests.filter((request) => request.status === this.selectedStaffStatus);
   }
 }

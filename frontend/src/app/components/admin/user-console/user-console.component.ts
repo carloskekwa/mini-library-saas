@@ -93,7 +93,6 @@ import { UserAdminService } from '../../../services/user-admin.service';
             </div>
             <div class="col-md-8 d-flex gap-2">
               <button class="btn btn-primary" (click)="openPenalties()">Open Penalties</button>
-              <button class="btn btn-outline-primary" (click)="openAudit()">Open Audit Logs</button>
               <button class="btn btn-outline-secondary" (click)="openBookRequests()">Open Book Requests</button>
             </div>
           </div>
@@ -199,13 +198,6 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
       return;
     }
     this.router.navigate(['/admin/penalties'], { queryParams: { userId: this.selectedUserId } });
-  }
-
-  openAudit(): void {
-    if (!this.selectedUserId) {
-      return;
-    }
-    this.router.navigate(['/admin/audit-logs'], { queryParams: { mode: 'user', userId: this.selectedUserId } });
   }
 
   openBookRequests(): void {

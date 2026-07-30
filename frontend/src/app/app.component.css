@@ -55,27 +55,6 @@
 
 .brand-copy small {
   color: #57738e;
-  font-size: 0.74rem;
-}
-
-.topbar-center {
-  display: flex;
-  justify-content: center;
-}
-
-.search-pill {
-  border-radius: 999px;
-  display: flex;
-  flex: 1;
-  width: 100%;
-  max-width: 560px;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.9rem;
-  color: #55718a;
-  font-size: 0.86rem;
-  border: 1px solid rgba(198, 216, 236, 0.8);
-  background: rgba(252, 254, 255, 0.8);
 }
 
 .topbar-actions {
@@ -86,12 +65,12 @@
 
 .icon-chip,
 .pill-action {
-  border: 1px solid #d6e5f5;
-  color: #2c4e72;
-  background: #fdfefe;
+  border: 1px solid rgba(182, 198, 218, 0.9);
+  color: #2f455f;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
   text-decoration: none;
   border-radius: 999px;
-  font-size: 0.82rem;
+  font-size: 0.81rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -115,8 +94,8 @@
 
 .pill-action.primary,
 .active-pill {
-  border-color: #2a74e0;
-  background: linear-gradient(145deg, #4f96f4, #2f6fe0);
+  border-color: #0b63d1;
+  background: linear-gradient(180deg, #3090ff 0%, #0a74ef 100%);
   color: white;
 }
 
@@ -161,12 +140,12 @@
 }
 
 .logout-btn {
-  border: 0;
+  border: 1px solid rgba(182, 198, 218, 0.9);
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  color: #35618d;
-  background: #eef5fd;
+  color: #2f455f;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
 }
 
 .app-body {
@@ -214,10 +193,6 @@
   transition: all 0.2s ease;
 }
 
-.app-sidebar a i {
-  font-size: 0.98rem;
-}
-
 .app-sidebar a span {
   font-size: 0.86rem;
   font-weight: 600;
@@ -256,18 +231,10 @@
   padding: 0.15rem;
 }
 
-.app-footer p {
-  margin: 0;
-}
-
 @media (max-width: 1100px) {
   .app-topbar {
     grid-template-columns: 1fr;
     gap: 0.5rem;
-  }
-
-  .topbar-center {
-    justify-content: flex-start;
   }
 
   .app-sidebar {
@@ -276,18 +243,11 @@
     gap: 0.7rem;
   }
 
-  .app-sidebar section {
-    min-width: 0;
-  }
 }
 
 @media (max-width: 760px) {
   .app-shell {
     padding: 0.65rem;
-  }
-
-  .search-pill {
-    display: none;
   }
 
   .app-sidebar {
