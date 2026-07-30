@@ -1,22 +1,24 @@
 h1 {
-  color: #0d47a1;
-  font-weight: 600;
+  color: #153d64;
+  font-weight: 800;
   margin-bottom: 10px;
 }
 
 .lead {
-  color: #666;
+  color: #5d7891;
   font-size: 1.2rem;
 }
 
 .book-cover-large {
-  background-color: #f0f0f0;
-  border-radius: 8px;
+  background: linear-gradient(180deg, #f6f9ff, #ecf3fd);
+  border-radius: 18px;
+  border: 1px solid #d8e6f6;
   overflow: hidden;
   aspect-ratio: 3 / 4;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 14px 28px rgba(21, 56, 92, 0.12);
 }
 
 .book-cover-large img {
@@ -31,7 +33,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #0d47a1, #1e88e5);
+  background: linear-gradient(145deg, #57a0fb, #2f72e0);
   color: #fff;
 }
 
@@ -42,10 +44,12 @@ h1 {
 }
 
 .book-info {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid #dce9f6;
+  padding: 1.1rem;
+  border-radius: 16px;
   margin-top: 20px;
+  box-shadow: 0 10px 24px rgba(27, 58, 93, 0.09);
 }
 
 .book-info p {
@@ -63,7 +67,7 @@ h1 {
 
 .stars {
   font-size: 1.5rem;
-  color: #ddd;
+  color: #d2dbe5;
 }
 
 .stars span.filled {
@@ -72,7 +76,7 @@ h1 {
 
 .rating-small {
   font-size: 1rem;
-  color: #ddd;
+  color: #d2dbe5;
 }
 
 .rating-small span.filled {
@@ -80,8 +84,9 @@ h1 {
 }
 
 .card {
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dbe8f6;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(27, 58, 93, 0.09);
 }
 
 .btn-primary {

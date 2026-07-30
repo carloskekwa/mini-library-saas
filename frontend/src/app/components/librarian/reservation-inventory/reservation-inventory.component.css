@@ -1,4 +1,9 @@
-h1 { color: #0d47a1; font-weight: 700; }
-.lead { color: #5f6b7a; }
-.card { border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-.table thead th { background-color: #f7f9fc; font-weight: 600; }
+h1 { color: #143b61; font-weight: 800; }
+.lead { color: #648099; }
+.card {
+	border: 1px solid #dce9f6;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.84);
+	box-shadow: 0 14px 30px rgba(24, 56, 92, 0.1);
+}
+.table thead th { background-color: #f7faff; font-weight: 700; }

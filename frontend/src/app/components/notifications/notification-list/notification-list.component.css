@@ -1,31 +1,31 @@
 h1 {
-  color: #0d47a1;
-  font-weight: 600;
+  color: #143b61;
+  font-weight: 800;
 }
 
 .notification-card {
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-left: 4px solid #0d47a1;
-  padding: 15px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid #dce9f6;
+  border-left: 4px solid #2f72e0;
+  padding: 1rem;
   margin-bottom: 15px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(20, 52, 85, 0.08);
   transition: background-color 0.2s;
 }
 
 .notification-card.unread {
-  background-color: #f0f7ff;
-  border-left-color: #1565c0;
+  background: linear-gradient(145deg, #f7fbff, #edf5ff);
+  border-left-color: #2a6fdf;
 }
 
 .notification-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16px 30px rgba(20, 52, 85, 0.12);
 }
 
 .notification-title {
-  color: #0d47a1;
-  font-weight: 600;
+  color: #1f4e7d;
+  font-weight: 700;
   margin-bottom: 5px;
 }
 
@@ -38,7 +38,8 @@ h1 {
 .notification-actions {
   display: flex;
   gap: 5px;
-  margin-left: 10px;
+  margin-left: 12px;
+  flex-shrink: 0;
 }
 
 .btn-sm {

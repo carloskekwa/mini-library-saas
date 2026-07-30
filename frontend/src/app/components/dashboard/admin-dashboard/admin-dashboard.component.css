@@ -1,8 +1,20 @@
 .role-dashboard h1 {
-  color: #0d47a1;
-  font-weight: 700;
+  color: #143b61;
+  font-weight: 800;
 }
 
 .role-dashboard .lead {
-  color: #5f6b7a;
+  color: #648099;
+}
+
+.role-dashboard .card {
+  border: 1px solid #dce9f6;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 14px 30px rgba(24, 56, 92, 0.1);
+}
+
+.role-dashboard .card-title {
+  color: #1d4d7d;
+  font-weight: 700;
 }

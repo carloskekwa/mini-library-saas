@@ -1,98 +1,82 @@
-<header>
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" routerLink="/books">
-        <i class="bi bi-book"></i> {{ title }}
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li *ngIf="isLoggedIn && canSeeBooksMenu" class="nav-item">
-            <a class="nav-link" routerLink="/books" routerLinkActive="active">Books</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeMyBorrowsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/borrows" routerLinkActive="active">My Borrows</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeReservationsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/reservations" routerLinkActive="active">Reservations</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeWishlistMenu" class="nav-item">
-            <a class="nav-link" routerLink="/wishlist" routerLinkActive="active">Wishlist</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeBookRequestsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/book-requests" routerLinkActive="active">Book Requests</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeManageBooksMenu" class="nav-item">
-            <a class="nav-link" routerLink="/manage/books" routerLinkActive="active">Manage Books</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeManageCategoriesMenu" class="nav-item">
-            <a class="nav-link" routerLink="/manage/categories" routerLinkActive="active">Categories</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeAdminExtraOperationsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/reports" routerLinkActive="active">Reports</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeAdminExtraOperationsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/operations/batch-import" routerLinkActive="active">Batch Import</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeAdminExtraOperationsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/dashboard/librarian" routerLinkActive="active">Librarian Hub</a>
-          </li>
-          <li *ngIf="isLoggedIn && isAdmin" class="nav-item">
-            <a class="nav-link" routerLink="/dashboard/admin" routerLinkActive="active">Admin Hub</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeePenaltiesMenu" class="nav-item">
-            <a class="nav-link" routerLink="/admin/penalties" routerLinkActive="active">Penalties</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeLibrarianInventoryMenu" class="nav-item">
-            <a class="nav-link" routerLink="/librarian/borrowed-inventory" routerLinkActive="active">Borrowed Inventory</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeLibrarianReservationMenu" class="nav-item">
-            <a class="nav-link" routerLink="/librarian/reservation-inventory" routerLinkActive="active">Reservation Inventory</a>
-          </li>
-          <li *ngIf="isLoggedIn && canSeeNotificationsMenu" class="nav-item">
-            <a class="nav-link" routerLink="/notifications" routerLinkActive="active">
-              Notifications
-              <span *ngIf="unreadNotificationCount > 0" class="badge bg-danger ms-1">
-                {{ unreadNotificationCount }}
-              </span>
-            </a>
-          </li>
-          <li *ngIf="isLoggedIn" class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-              {{ currentUser?.firstName }} {{ currentUser?.lastName }}
-              <span class="badge bg-light text-dark ms-1" *ngIf="currentUser?.roles?.length">
-                {{ currentUser.roles[0] }}
-              </span>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="userDropdown">
-              <li><a class="dropdown-item" [routerLink]="dashboardRoute">Dashboard</a></li>
-              <li *ngIf="canSeeAdminOnlyMenu"><a class="dropdown-item" routerLink="/admin/users">User Console</a></li>
-              <li *ngIf="canSeeAdminOnlyMenu"><a class="dropdown-item" routerLink="/admin/audit-logs">Audit Logs</a></li>
-              <li *ngIf="canSeeAdminOnlyMenu"><a class="dropdown-item" routerLink="/admin/config">System Config</a></li>
-              <li *ngIf="canSeeAdminOnlyMenu"><a class="dropdown-item" routerLink="/admin/email-templates">Email Templates</a></li>
-              <li *ngIf="canSeeAdminOnlyMenu"><a class="dropdown-item" routerLink="/admin/scheduled-tasks">Scheduled Tasks</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
-            </ul>
-          </li>
-          <li *ngIf="!isLoggedIn" class="nav-item">
-            <a class="nav-link" routerLink="/login">Login</a>
-          </li>
-          <li *ngIf="!isLoggedIn" class="nav-item">
-            <a class="nav-link" routerLink="/register">Register</a>
-          </li>
-        </ul>
+<div class="app-shell">
+  <header class="app-topbar">
+    <a class="brand" routerLink="/books" aria-label="Mini Library Home">
+      <span class="brand-icon"><i class="bi bi-cloud-fill"></i></span>
+      <span class="brand-copy">
+        <strong>{{ title }}</strong>
+        <small>Library Cloud Workspace</small>
+      </span>
+    </a>
+
+    <div class="topbar-center" *ngIf="isLoggedIn">
+      <div class="search-pill">
+        <i class="bi bi-search"></i>
+        <span>Search books, members, reports</span>
       </div>
     </div>
-  </nav>
-</header>
 
-<main>
-  <router-outlet></router-outlet>
-</main>
+    <div class="topbar-actions">
+      <a *ngIf="isLoggedIn && canSeeNotificationsMenu" class="icon-chip" routerLink="/notifications" routerLinkActive="active-pill" [routerLinkActiveOptions]="{ exact: true }" (click)="updateNotificationCount()">
+        <i class="bi bi-bell"></i>
+        <span>Notifications</span>
+        <em *ngIf="unreadNotificationCount > 0">{{ unreadNotificationCount }}</em>
+      </a>
 
-<footer class="bg-dark text-white text-center py-4 mt-5">
-  <p>&copy; 2026 Mini Library SaaS. All rights reserved.</p>
-</footer>
+      <a *ngIf="!isLoggedIn" class="pill-action" routerLink="/login">Sign in</a>
+      <a *ngIf="!isLoggedIn" class="pill-action primary" routerLink="/register">Create account</a>
+
+      <div class="profile-chip" *ngIf="isLoggedIn">
+        <span class="profile-avatar">{{ currentUser?.firstName?.charAt(0) || 'U' }}</span>
+        <div class="profile-copy">
+          <strong>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</strong>
+          <small>{{ currentUser?.roles?.[0] || 'MEMBER' }}</small>
+        </div>
+        <button class="logout-btn" (click)="logout()" title="Logout" aria-label="Logout">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-body" [class.with-sidebar]="isLoggedIn">
+    <aside class="app-sidebar" *ngIf="isLoggedIn">
+      <section>
+        <h6>Workspace</h6>
+        <a [routerLink]="dashboardRoute" routerLinkActive="active"><i class="bi bi-grid"></i><span>Dashboard</span></a>
+        <a *ngIf="canSeeBooksMenu" routerLink="/books" routerLinkActive="active"><i class="bi bi-book"></i><span>Books</span></a>
+        <a *ngIf="canSeeMyBorrowsMenu" routerLink="/borrows" routerLinkActive="active"><i class="bi bi-journal-check"></i><span>My Borrows</span></a>
+        <a *ngIf="canSeeReservationsMenu" routerLink="/reservations" routerLinkActive="active"><i class="bi bi-calendar2-check"></i><span>Reservations</span></a>
+        <a *ngIf="canSeeWishlistMenu" routerLink="/wishlist" routerLinkActive="active"><i class="bi bi-heart"></i><span>Wishlist</span></a>
+        <a *ngIf="canSeeBookRequestsMenu" routerLink="/book-requests" routerLinkActive="active"><i class="bi bi-send"></i><span>Book Requests</span></a>
+      </section>
+
+      <section *ngIf="isLibrarian || isAdmin">
+        <h6>Operations</h6>
+        <a *ngIf="canSeeManageBooksMenu" routerLink="/manage/books" routerLinkActive="active"><i class="bi bi-stack"></i><span>Manage Books</span></a>
+        <a *ngIf="canSeeManageCategoriesMenu" routerLink="/manage/categories" routerLinkActive="active"><i class="bi bi-tags"></i><span>Categories</span></a>
+        <a *ngIf="canSeeLibrarianInventoryMenu" routerLink="/librarian/borrowed-inventory" routerLinkActive="active"><i class="bi bi-archive"></i><span>Borrowed Inventory</span></a>
+        <a *ngIf="canSeeLibrarianReservationMenu" routerLink="/librarian/reservation-inventory" routerLinkActive="active"><i class="bi bi-list-check"></i><span>Reservation Inventory</span></a>
+        <a *ngIf="canSeePenaltiesMenu" routerLink="/admin/penalties" routerLinkActive="active"><i class="bi bi-exclamation-octagon"></i><span>Penalties</span></a>
+      </section>
+
+      <section *ngIf="isAdmin">
+        <h6>Admin Studio</h6>
+        <a routerLink="/reports" routerLinkActive="active"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
+        <a routerLink="/operations/batch-import" routerLinkActive="active"><i class="bi bi-upload"></i><span>Batch Import</span></a>
+        <a routerLink="/admin/users" routerLinkActive="active"><i class="bi bi-people"></i><span>User Console</span></a>
+        <a routerLink="/admin/audit-logs" routerLinkActive="active"><i class="bi bi-shield-check"></i><span>Audit Logs</span></a>
+        <a routerLink="/admin/config" routerLinkActive="active"><i class="bi bi-sliders"></i><span>System Config</span></a>
+        <a routerLink="/admin/email-templates" routerLinkActive="active"><i class="bi bi-envelope-paper"></i><span>Email Templates</span></a>
+        <a routerLink="/admin/scheduled-tasks" routerLinkActive="active"><i class="bi bi-clock-history"></i><span>Scheduled Tasks</span></a>
+      </section>
+    </aside>
+
+    <main class="app-main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <p>Mini Library SaaS · Crafted for calm, focused library operations.</p>
+  </footer>
+</div>

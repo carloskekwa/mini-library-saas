@@ -1,29 +1,45 @@
 .container {
-  max-width: 700px;
+  max-width: 760px;
+  padding-top: 1.4rem;
 }
 
 .card {
+  border: 1px solid #dbe8f6;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 18px 34px rgba(29, 60, 98, 0.1);
+  overflow: hidden;
+}
+
+.card-header {
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.2rem;
+  background: linear-gradient(145deg, #f4f9ff, #e7f1ff);
+}
+
+.card-header h4 {
+  color: #1f4d7f;
+  font-weight: 700;
 }
 
 .form-control:focus {
-  border-color: #0d47a1;
-  box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+  border-color: #6fa3ed;
+  box-shadow: 0 0 0 3px rgba(56, 126, 227, 0.15);
 }
 
 .btn-primary {
-  background-color: #0d47a1;
-  border: none;
+  border: 0;
+  background: linear-gradient(140deg, #4f97f4, #2868d9);
 }
 
 .btn-primary:hover {
-  background-color: #1565c0;
+  filter: brightness(1.03);
 }
 
 a {
-  color: #0d47a1;
+  color: #275f9f;
   text-decoration: none;
+  font-weight: 600;
 }
 
 a:hover {

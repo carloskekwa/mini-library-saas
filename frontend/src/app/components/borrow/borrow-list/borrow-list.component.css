@@ -1,18 +1,21 @@
 h1 {
-  color: #0d47a1;
-  font-weight: 600;
+  color: #143b61;
+  font-weight: 800;
   margin-bottom: 30px;
 }
 
 .card {
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dce9f6;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 14px 30px rgba(24, 56, 92, 0.1);
 }
 
 .card-header {
-  background-color: #0d47a1;
-  color: white;
-  border-radius: 8px 8px 0 0;
+  background: linear-gradient(145deg, #f4f9ff, #e9f2fe);
+  color: #204a76;
+  border-bottom: 1px solid #dce9f6;
+  border-radius: 18px 18px 0 0;
   padding: 15px;
 }
 
@@ -21,9 +24,9 @@ h1 {
 }
 
 .table thead th {
-  background-color: #f5f5f5;
-  font-weight: 600;
-  border-bottom: 2px solid #ddd;
+  background-color: #f7faff;
+  font-weight: 700;
+  border-bottom: 1px solid #d8e5f4;
 }
 
 .table tbody tr:hover {
@@ -31,7 +34,7 @@ h1 {
 }
 
 .table-danger {
-  background-color: #ffe0e0;
+  background-color: #fff3f5;
 }
 
 .btn-sm {
@@ -57,7 +60,7 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(140deg, #0d47a1, #1976d2);
+  background: linear-gradient(140deg, #57a0fb, #2f72e0);
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
