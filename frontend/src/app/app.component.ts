@@ -1,12 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Location } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { NotificationService } from './services/notification.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -21,12 +19,13 @@ export class AppComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   unreadNotificationCount = 0;
   private destroy$ = new Subject<void>();
+  private navHistory: string[] = [];
+  private readonly AUTH_ROUTES = ['/login', '/register'];
 
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
-    private router: Router,
-    private location: Location
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +34,19 @@ export class AppComponent implements OnInit, OnDestroy {
       this.isLoggedIn = !!user;
       if (this.isLoggedIn) {
         this.updateNotificationCount();
+      }
+    });
+
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      takeUntil(this.destroy$)
+    ).subscribe((e: any) => {
+      const url: string = (e as NavigationEnd).urlAfterRedirects;
+      if (!this.AUTH_ROUTES.some(r => url.startsWith(r))) {
+        const last = this.navHistory[this.navHistory.length - 1];
+        if (last !== url) {
+          this.navHistory.push(url);
+        }
       }
     });
   }
@@ -130,6 +142,11 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.isAdmin;
   }
 
+  get isOnDashboard(): boolean {
+    const current = this.navHistory[this.navHistory.length - 1] ?? '';
+    return current.startsWith('/dashboard');
+  }
+
   get dashboardRoute(): string {
     return this.authService.getDefaultRouteForCurrentUser();
   }
@@ -139,11 +156,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    if (window.history.length > 1) {
-      this.location.back();
-      return;
+    // Remove the current page from history
+    this.navHistory.pop();
+    const previous = this.navHistory[this.navHistory.length - 1];
+    if (previous && !previous.startsWith('/dashboard')) {
+      this.router.navigateByUrl(previous);
+    } else {
+      this.router.navigateByUrl(this.dashboardRoute);
     }
-    this.router.navigateByUrl(this.dashboardRoute);
   }
 
   logout(): void {

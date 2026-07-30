@@ -27,27 +27,27 @@ import { UserAdminService } from '../../../services/user-admin.service';
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Username</label>
-              <input class="form-control" [(ngModel)]="newUsername" placeholder="username" />
+              <input class="form-control" [(ngModel)]="newUsername" placeholder="username" autocomplete="off" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Email</label>
-              <input class="form-control" [(ngModel)]="newEmail" placeholder="email" />
+              <input class="form-control" [(ngModel)]="newEmail" placeholder="email" autocomplete="off" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Password</label>
-              <input type="password" class="form-control" [(ngModel)]="newPassword" placeholder="Minimum 8 characters" />
+              <input type="password" class="form-control" [(ngModel)]="newPassword" placeholder="Minimum 8 characters" autocomplete="new-password" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Confirm Password</label>
-              <input type="password" class="form-control" [(ngModel)]="newPasswordConfirm" placeholder="Repeat password" />
+              <input type="password" class="form-control" [(ngModel)]="newPasswordConfirm" placeholder="Repeat password" autocomplete="new-password" />
             </div>
             <div class="col-md-6">
               <label class="form-label">First Name (optional)</label>
-              <input class="form-control" [(ngModel)]="newFirstName" placeholder="First name" />
+              <input class="form-control" [(ngModel)]="newFirstName" placeholder="First name" autocomplete="off" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Last Name (optional)</label>
-              <input class="form-control" [(ngModel)]="newLastName" placeholder="Last name" />
+              <input class="form-control" [(ngModel)]="newLastName" placeholder="Last name" autocomplete="off" />
             </div>
             <div class="col-12 d-flex gap-2">
               <button class="btn btn-primary" (click)="createUser()" [disabled]="creatingUser">
