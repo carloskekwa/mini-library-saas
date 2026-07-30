@@ -15,6 +15,11 @@ public class UpdateBookRequest {
     @Size(min = 1, max = 255, message = "Author must be between 1 and 255 characters")
     private String author;
 
+    @Size(max = 50, message = "ISBN must be at most 50 characters")
+    private String isbn;
+
+    private Long categoryId;
+
     @Size(max = 255, message = "Publisher must be at most 255 characters")
     private String publisher;
 
@@ -65,6 +70,22 @@ public class UpdateBookRequest {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getPublisher() {

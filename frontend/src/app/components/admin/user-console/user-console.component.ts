@@ -15,11 +15,48 @@ import { UserAdminService } from '../../../services/user-admin.service';
   template: `
     <div class="container-main">
       <h1>User Console</h1>
-      <p class="lead" *ngIf="isAdmin">Search users, update account status, and open moderation workflows.</p>
+      <p class="lead" *ngIf="isAdmin">Create new user accounts, update account status, and open moderation workflows.</p>
       <p class="lead" *ngIf="!isAdmin">Search users and open moderation workflows.</p>
 
       <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
       <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div class="card mb-4" *ngIf="isAdmin">
+        <div class="card-body">
+          <h5 class="mb-3">Create User</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Username</label>
+              <input class="form-control" [(ngModel)]="newUsername" placeholder="username" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input class="form-control" [(ngModel)]="newEmail" placeholder="email" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" [(ngModel)]="newPassword" placeholder="Minimum 8 characters" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" [(ngModel)]="newPasswordConfirm" placeholder="Repeat password" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">First Name (optional)</label>
+              <input class="form-control" [(ngModel)]="newFirstName" placeholder="First name" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name (optional)</label>
+              <input class="form-control" [(ngModel)]="newLastName" placeholder="Last name" />
+            </div>
+            <div class="col-12 d-flex gap-2">
+              <button class="btn btn-primary" (click)="createUser()" [disabled]="creatingUser">
+                {{ creatingUser ? 'Creating...' : 'Create User' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="card mb-4">
         <div class="card-body">
@@ -91,7 +128,10 @@ import { UserAdminService } from '../../../services/user-admin.service';
           <div class="row g-3 align-items-end mt-2">
             <div class="col-md-4">
               <label class="form-label">Selected User ID</label>
-              <input type="number" class="form-control" [(ngModel)]="selectedUserId" placeholder="Select from table or type ID" />
+              <select class="form-select" [(ngModel)]="selectedUserId" [disabled]="users.length === 0">
+                <option [ngValue]="null">Select from table view</option>
+                <option *ngFor="let user of users" [ngValue]="user.id">{{ user.id }} - {{ user.username }}</option>
+              </select>
             </div>
             <div class="col-md-8 d-flex gap-2">
               <button class="btn btn-primary" (click)="openPenalties()">Open Penalties</button>
@@ -117,8 +157,15 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
   pageSize = 20;
   totalElements = 0;
   loading = false;
+  creatingUser = false;
   error = '';
   successMessage = '';
+  newUsername = '';
+  newEmail = '';
+  newPassword = '';
+  newPasswordConfirm = '';
+  newFirstName = '';
+  newLastName = '';
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -130,6 +177,10 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
 
   get isAdmin(): boolean {
     return this.authService.hasRole('ADMIN');
+  }
+
+  get isLibrarian(): boolean {
+    return this.authService.hasRole('LIBRARIAN');
   }
 
   ngOnInit(): void {
@@ -156,8 +207,13 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
       status: this.statusFilter
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        this.users = response.content || [];
-        this.totalElements = response.totalElements || this.users.length;
+        const fetchedUsers = response.content || [];
+        this.users = this.isLibrarian
+          ? fetchedUsers.filter((user) => user.roles?.includes('MEMBER'))
+          : fetchedUsers;
+        this.totalElements = this.isLibrarian
+          ? this.users.length
+          : (response.totalElements || this.users.length);
         this.loading = false;
         this.syncUrl();
       },
@@ -183,6 +239,52 @@ export class UserConsoleComponent implements OnInit, OnDestroy {
   changePage(page: number): void {
     this.currentPage = page;
     this.loadUsers();
+  }
+
+  createUser(): void {
+    if (!this.isAdmin) {
+      return;
+    }
+
+    if (!this.newUsername.trim() || !this.newEmail.trim() || !this.newPassword) {
+      this.error = 'Username, email, and password are required.';
+      return;
+    }
+
+    if (this.newPassword !== this.newPasswordConfirm) {
+      this.error = 'Password and confirmation do not match.';
+      return;
+    }
+
+    this.creatingUser = true;
+    this.error = '';
+
+    this.userAdminService.createUser({
+      username: this.newUsername.trim(),
+      email: this.newEmail.trim(),
+      password: this.newPassword,
+      passwordConfirm: this.newPasswordConfirm,
+      firstName: this.newFirstName.trim() || undefined,
+      lastName: this.newLastName.trim() || undefined
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (user) => {
+          this.creatingUser = false;
+          this.successMessage = `User ${user.username} created successfully.`;
+          this.newUsername = '';
+          this.newEmail = '';
+          this.newPassword = '';
+          this.newPasswordConfirm = '';
+          this.newFirstName = '';
+          this.newLastName = '';
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (err) => {
+          this.creatingUser = false;
+          this.error = err.error?.message || 'Failed to create user';
+        }
+      });
   }
 
   setStatus(user: User, status: string): void {

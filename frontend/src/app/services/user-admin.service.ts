@@ -36,4 +36,15 @@ export class UserAdminService {
     const params = new HttpParams().set('status', status);
     return this.http.put<User>(`${this.apiUrl}/${userId}/status`, {}, { params });
   }
+
+  createUser(request: {
+    username: string;
+    email: string;
+    password: string;
+    passwordConfirm: string;
+    firstName?: string;
+    lastName?: string;
+  }): Observable<User> {
+    return this.http.post<User>(this.apiUrl, request);
+  }
 }

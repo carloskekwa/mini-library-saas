@@ -66,7 +66,20 @@ export class BookRequestsComponent implements OnInit, OnDestroy {
     return this.authService.hasRole('ADMIN');
   }
 
+  get isLibrarian(): boolean {
+    return this.authService.hasRole('LIBRARIAN');
+  }
+
+  get canSubmitRequest(): boolean {
+    return this.authService.hasRole('MEMBER');
+  }
+
   createRequest(): void {
+    if (!this.canSubmitRequest) {
+      this.error = 'Only members can submit book requests.';
+      return;
+    }
+
     if (!this.bookTitle.trim() || !this.author.trim()) {
       this.error = 'Title and author are required.';
       return;

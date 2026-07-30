@@ -40,11 +40,11 @@
         <a *ngIf="canSeeMyBorrowsMenu" routerLink="/borrows" routerLinkActive="active"><i class="bi bi-journal-check"></i><span>My Borrows</span></a>
         <a *ngIf="canSeeReservationsMenu" routerLink="/reservations" routerLinkActive="active"><i class="bi bi-calendar2-check"></i><span>Reservations</span></a>
         <a *ngIf="canSeeWishlistMenu" routerLink="/wishlist" routerLinkActive="active"><i class="bi bi-heart"></i><span>Wishlist</span></a>
-        <a *ngIf="canSeeBookRequestsMenu" routerLink="/book-requests" routerLinkActive="active"><i class="bi bi-send"></i><span>Book Requests</span></a>
       </section>
 
       <section *ngIf="isLibrarian || isAdmin">
         <h6>Operations</h6>
+        <a *ngIf="canSeeManageBooksMenu" routerLink="/manage/books" routerLinkActive="active"><i class="bi bi-journal-richtext"></i><span>Book Management</span></a>
         <a *ngIf="canSeeManageCategoriesMenu" routerLink="/manage/categories" routerLinkActive="active"><i class="bi bi-tags"></i><span>Categories</span></a>
         <a *ngIf="canSeeLibrarianInventoryMenu" routerLink="/librarian/borrowed-inventory" routerLinkActive="active"><i class="bi bi-archive"></i><span>Borrowed Inventory</span></a>
         <a *ngIf="canSeeLibrarianReservationMenu" routerLink="/librarian/reservation-inventory" routerLinkActive="active"><i class="bi bi-list-check"></i><span>Reservation Inventory</span></a>

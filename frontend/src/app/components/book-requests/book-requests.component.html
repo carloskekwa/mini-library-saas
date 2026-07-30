@@ -12,7 +12,7 @@
     <button type="button" class="btn-close" (click)="successMessage = ''"></button>
   </div>
 
-  <div class="card mb-4">
+  <div class="card mb-4" *ngIf="canSubmitRequest">
     <div class="card-header"><h5 class="mb-0">Create Request</h5></div>
     <div class="card-body">
       <div class="row g-3">
@@ -90,7 +90,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" *ngIf="!isLibrarian">
     <div class="card-header"><h5 class="mb-0">My Requests</h5></div>
     <div class="table-responsive">
       <table class="table mb-0">

@@ -149,8 +149,10 @@ export class BookManagementComponent implements OnInit, OnDestroy {
       const updateRequest: UpdateBookRequest = {
         title: this.form.value.title,
         author: this.form.value.author,
+        categoryId: Number(this.form.value.categoryId),
         totalCopies: Number(this.form.value.totalCopies),
         availableCopies: Number(this.form.value.availableCopies),
+        isbn: this.form.value.isbn || undefined,
         publisher: this.form.value.publisher || undefined,
         publicationYear: this.form.value.publicationYear || undefined,
         description: this.form.value.description || undefined,

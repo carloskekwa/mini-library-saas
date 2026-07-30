@@ -1,6 +1,7 @@
 package com.library.controller;
 
 import com.library.dto.UpdateProfileRequest;
+import com.library.dto.CreateUserRequest;
 import com.library.dto.UserDTO;
 import com.library.entity.User;
 import com.library.service.UserService;
@@ -96,6 +97,25 @@ public class UserController {
 
         User updatedUser = userService.updateUserStatus(id, status);
         return ResponseEntity.ok(UserDTO.from(updatedUser));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create user", description = "Create a new user account (MEMBER role by default)")
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequest request) {
+        if (!request.getPassword().equals(request.getPasswordConfirm())) {
+            throw new IllegalArgumentException("Password and confirmation do not match");
+        }
+
+        User createdUser = userService.createUser(
+            request.getUsername(),
+            request.getEmail(),
+            request.getPassword(),
+            request.getFirstName(),
+            request.getLastName()
+        );
+
+        return ResponseEntity.ok(UserDTO.from(createdUser));
     }
 
     private boolean hasRole(User user, String roleName) {

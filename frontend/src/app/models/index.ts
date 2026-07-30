@@ -78,8 +78,10 @@ export interface CreateBookRequest {
 export interface UpdateBookRequest {
   title: string;
   author: string;
+  categoryId?: number;
   totalCopies: number;
   availableCopies?: number;
+  isbn?: string;
   publisher?: string;
   publicationYear?: number;
   description?: string;

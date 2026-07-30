@@ -179,7 +179,8 @@ public class BookController {
     @ApiResponse(responseCode = "404", description = "Book not found")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @Valid @RequestBody UpdateBookRequest request) {
-        Book book = bookService.updateBook(id, request.getTitle(), request.getAuthor(), 
+        Book book = bookService.updateBook(id, request.getTitle(), request.getAuthor(),
+                                          request.getCategoryId(), request.getIsbn(),
                                           request.getPublisher(), request.getPublicationYear(),
                                           request.getDescription(), request.getLanguage(),
                                           request.getShelfLocation(), request.getTotalCopies(), request.getAvailableCopies(),

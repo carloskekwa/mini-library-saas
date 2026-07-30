@@ -105,7 +105,7 @@ public class BookService {
     /**
      * Update book information.
      */
-    public Book updateBook(Long bookId, String title, String author, String publisher, 
+    public Book updateBook(Long bookId, String title, String author, Long categoryId, String isbn, String publisher,
                           Integer publicationYear, String description, String language,
                           String shelfLocation, Integer totalCopies, Integer availableCopies, String coverImageUrl) {
         Book book = getBookById(bookId);
@@ -122,6 +122,14 @@ public class BookService {
         }
         if (author != null) {
             book.setAuthor(author);
+        }
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
+            book.setCategory(category);
+        }
+        if (isbn != null) {
+            book.setIsbn(isbn);
         }
         if (publisher != null) {
             book.setPublisher(publisher);
