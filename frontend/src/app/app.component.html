@@ -1,17 +1,19 @@
 <div class="app-shell">
   <header class="app-topbar">
-    <a class="brand" routerLink="/books" aria-label="Mini Library Home">
-      <span class="brand-icon"><i class="bi bi-cloud-fill"></i></span>
-      <span class="brand-copy">
-        <strong>{{ title }}</strong>
-        <small>Library Cloud Workspace</small>
-      </span>
-    </a>
+    <div class="topbar-left">
+      <a class="brand" routerLink="/books" aria-label="Mini Library Home">
+        <span class="brand-icon"><i class="bi bi-cloud-fill"></i></span>
+        <span class="brand-copy">
+          <strong>{{ title }}</strong>
+          <small>Library Cloud Workspace</small>
+        </span>
+      </a>
 
-    <button *ngIf="isLoggedIn && !isOnDashboard" class="icon-chip back-chip" (click)="goBack()" title="Go back" aria-label="Go back">
-      <i class="bi bi-arrow-left"></i>
-      <span>Back</span>
-    </button>
+      <button *ngIf="isLoggedIn && !isOnDashboard" class="icon-chip back-chip" (click)="goBack()" title="Go back" aria-label="Go back">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back</span>
+      </button>
+    </div>
 
     <div class="topbar-actions">
 
