@@ -79,6 +79,10 @@
   padding: 0.45rem 0.72rem;
 }
 
+.back-chip {
+  font-weight: 700;
+}
+
 .icon-chip em {
   font-style: normal;
   background: #dc2626;
