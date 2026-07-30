@@ -36,6 +36,15 @@ export class BookService {
     });
   }
 
+  searchByTitleOrAuthor(keyword: string, page: number = 0, pageSize: number = 20): Observable<PagedResponse<Book>> {
+    return this.http.get<PagedResponse<Book>>(`${this.apiUrl}/search/title-author`, {
+      params: new HttpParams()
+        .set('keyword', keyword)
+        .set('page', page.toString())
+        .set('pageSize', pageSize.toString())
+    });
+  }
+
   searchByAuthor(author: string): Observable<PagedResponse<Book>> {
     return this.http.get<PagedResponse<Book>>(`${this.apiUrl}/search/author`, {
       params: new HttpParams().set('author', author)

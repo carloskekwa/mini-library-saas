@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.dto.BorrowBookRequest;
 import com.library.dto.BorrowRecordDTO;
+import com.library.dto.MarkLostRequest;
 import com.library.dto.ReturnBookRequest;
 import com.library.dto.ReturnRecordDTO;
 import com.library.entity.ReturnRecord;
@@ -108,6 +109,30 @@ public class BorrowController {
         
         BorrowRecordDTO borrowRecord = borrowService.renewBorrow(borrowRecordId);
         return ResponseEntity.ok(borrowRecord);
+    }
+
+    /**
+     * Mark an active borrow as lost and apply a fine.
+     * POST /api/borrow/{borrowRecordId}/lost
+     */
+    @PostMapping("/{borrowRecordId}/lost")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @Operation(summary = "Mark borrow as lost", description = "Mark an active borrow as lost and create a fine record")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Borrow marked as lost successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid lost-book request"),
+        @ApiResponse(responseCode = "404", description = "Borrow record not found")
+    })
+    public ResponseEntity<ReturnRecordDTO> markBorrowAsLost(
+        @PathVariable Long borrowRecordId,
+        @Valid @RequestBody MarkLostRequest request) {
+
+        ReturnRecordDTO returnRecord = borrowService.markBorrowAsLost(
+            borrowRecordId,
+            request.getFineAmount(),
+            request.getNotes()
+        );
+        return ResponseEntity.ok(returnRecord);
     }
 
     /**

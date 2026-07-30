@@ -67,7 +67,7 @@ export class BookListComponent implements OnInit, OnDestroy {
     if (this.selectedCategoryId) {
       obs$ = this.bookService.getBooksByCategory(this.selectedCategoryId, this.currentPage, this.pageSize, this.searchTerm);
     } else if (this.searchTerm.trim()) {
-      obs$ = this.bookService.searchByTitle(this.searchTerm, this.currentPage, this.pageSize);
+      obs$ = this.bookService.searchByTitleOrAuthor(this.searchTerm, this.currentPage, this.pageSize);
     } else {
       obs$ = this.bookService.getBooks(this.currentPage, this.pageSize);
     }

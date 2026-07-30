@@ -20,6 +20,10 @@ export class BorrowService {
     return this.http.post<ReturnRecord>(`${this.apiUrl}/return`, payload);
   }
 
+  markBorrowAsLost(borrowId: number, payload: { fineAmount: number; notes?: string }): Observable<ReturnRecord> {
+    return this.http.post<ReturnRecord>(`${this.apiUrl}/${borrowId}/lost`, payload);
+  }
+
   renewBorrow(borrowId: number): Observable<BorrowRecord> {
     return this.http.post<BorrowRecord>(`${this.apiUrl}/${borrowId}/renew`, {});
   }

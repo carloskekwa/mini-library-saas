@@ -6,6 +6,7 @@ public class ReviewDTO {
     private Long id;
     private Long bookId;
     private Long userId;
+    private String username;
     private Integer rating;
     private String reviewText;
     private Integer helpfulCount;
@@ -13,10 +14,11 @@ public class ReviewDTO {
     private LocalDateTime updatedAt;
 
     public ReviewDTO() {}
-    public ReviewDTO(Long id, Long bookId, Long userId, Integer rating, String reviewText, Integer helpfulCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ReviewDTO(Long id, Long bookId, Long userId, String username, Integer rating, String reviewText, Integer helpfulCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.bookId = bookId;
         this.userId = userId;
+        this.username = username;
         this.rating = rating;
         this.reviewText = reviewText;
         this.helpfulCount = helpfulCount;
@@ -25,7 +27,17 @@ public class ReviewDTO {
     }
 
     public static ReviewDTO from(Review review) {
-        return new ReviewDTO(review.getId(), review.getBook().getId(), review.getUser().getId(), review.getRating(), review.getReviewText(), review.getHelpfulCount(), review.getCreatedAt(), review.getUpdatedAt());
+        return new ReviewDTO(
+            review.getId(),
+            review.getBook().getId(),
+            review.getUser().getId(),
+            review.getUser().getUsername(),
+            review.getRating(),
+            review.getReviewText(),
+            review.getHelpfulCount(),
+            review.getCreatedAt(),
+            review.getUpdatedAt()
+        );
     }
 
     public Long getId() { return id; }
@@ -34,6 +46,8 @@ public class ReviewDTO {
     public void setBookId(Long bookId) { this.bookId = bookId; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) { this.rating = rating; }
     public String getReviewText() { return reviewText; }

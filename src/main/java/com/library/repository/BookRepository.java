@@ -54,6 +54,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      */
     Page<Book> findByAuthorIgnoreCaseContaining(String author, Pageable pageable);
 
+       /**
+        * Search books by title or author (case-insensitive).
+        */
+       Page<Book> findByTitleIgnoreCaseContainingOrAuthorIgnoreCaseContaining(String title, String author, Pageable pageable);
+
     /**
      * Advanced search combining title, author, and description.
      */

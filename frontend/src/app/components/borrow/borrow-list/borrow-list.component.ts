@@ -194,6 +194,9 @@ export class BorrowListComponent implements OnInit, OnDestroy {
     if (status === 'OVERDUE') {
       return 'Overdue';
     }
+    if (status === 'LOST') {
+      return 'Lost';
+    }
     return status;
   }
 
@@ -209,6 +212,9 @@ export class BorrowListComponent implements OnInit, OnDestroy {
     }
     if (status === 'RETURNED') {
       return 'bg-success';
+    }
+    if (status === 'LOST') {
+      return 'bg-dark';
     }
     return 'bg-secondary';
   }

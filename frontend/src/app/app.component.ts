@@ -97,7 +97,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   get canSeePenaltiesMenu(): boolean {
-    return this.isAdmin || this.isLibrarian;
+    return this.isAdmin;
   }
 
   get canSeeLibrarianInventoryMenu(): boolean {

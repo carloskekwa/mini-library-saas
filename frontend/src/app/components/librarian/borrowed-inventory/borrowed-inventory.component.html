@@ -87,11 +87,16 @@
                   <option value="DAMAGED">DAMAGED</option>
                 </select>
                 <input class="form-control form-control-sm mb-1" placeholder="Damage notes (optional)" [(ngModel)]="damageNotes[record.id]" />
+                <input class="form-control form-control-sm mb-1" type="number" min="0.01" step="0.01" placeholder="Lost fine amount (e.g. 30.00)" [(ngModel)]="lostFineAmount[record.id]" />
+                <input class="form-control form-control-sm mb-1" placeholder="Lost notes (optional)" [(ngModel)]="lostNotes[record.id]" />
                 <button class="btn btn-sm btn-primary" [disabled]="processingId === record.id || record.renewalCount >= 3" (click)="renewRecord(record)">
                   {{ processingId === record.id ? 'Processing...' : 'Renew' }}
                 </button>
                 <button class="btn btn-sm btn-danger ms-1" [disabled]="processingId === record.id" (click)="returnRecord(record)">
                   Return
+                </button>
+                <button class="btn btn-sm btn-outline-danger ms-1" [disabled]="processingId === record.id" (click)="markAsLost(record)">
+                  Mark Lost
                 </button>
               </ng-template>
             </td>

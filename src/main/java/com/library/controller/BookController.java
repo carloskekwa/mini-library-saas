@@ -116,6 +116,21 @@ public class BookController {
     }
 
     /**
+     * Search books by title or author.
+     */
+    @GetMapping("/search/title-author")
+    @Operation(summary = "Search by title or author", description = "Search books by title or author")
+    @ApiResponse(responseCode = "200", description = "Search completed successfully")
+    public ResponseEntity<Page<BookDTO>> searchByTitleOrAuthor(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        Page<Book> books = bookService.searchByTitleOrAuthor(keyword, page, pageSize);
+        Page<BookDTO> dtos = books.map(BookDTO::from);
+        return ResponseEntity.ok(dtos);
+    }
+
+    /**
      * Get recent books.
      */
     @GetMapping("/recent")

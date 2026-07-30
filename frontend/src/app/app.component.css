@@ -16,7 +16,7 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 20px;
   display: grid;
-  grid-template-columns: minmax(220px, 1.2fr) 2fr auto;
+  grid-template-columns: minmax(220px, 1fr) auto;
   align-items: center;
   gap: 0.85rem;
   padding: 0.65rem 0.9rem;
@@ -60,6 +60,7 @@
 .topbar-actions {
   display: flex;
   align-items: center;
+  justify-self: end;
   gap: 0.55rem;
 }
 

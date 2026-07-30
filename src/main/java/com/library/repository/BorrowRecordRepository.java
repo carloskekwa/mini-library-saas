@@ -80,4 +80,11 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long
     @Query("SELECT COUNT(br) FROM BorrowRecord br WHERE br.user.id = :userId AND br.status IN ('PENDING', 'BORROWED', 'OVERDUE')")
     Integer countActiveBorrows(@Param("userId") Long userId);
 
+    /**
+     * Check whether a user currently has any overdue borrow.
+     */
+    @Query("SELECT CASE WHEN COUNT(br) > 0 THEN true ELSE false END FROM BorrowRecord br " +
+           "WHERE br.user.id = :userId AND (br.status = 'OVERDUE' OR (br.status = 'BORROWED' AND br.dueDate < CURRENT_TIMESTAMP))")
+    boolean hasOverdueBorrow(@Param("userId") Long userId);
+
 }

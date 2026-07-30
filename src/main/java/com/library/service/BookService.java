@@ -203,6 +203,14 @@ public class BookService {
     }
 
     /**
+     * Search books by title or author.
+     */
+    public Page<Book> searchByTitleOrAuthor(String keyword, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return bookRepository.findByTitleIgnoreCaseContainingOrAuthorIgnoreCaseContaining(keyword, keyword, pageable);
+    }
+
+    /**
      * Get recently added books.
      */
     public Page<Book> getRecentBooks(int page, int pageSize) {

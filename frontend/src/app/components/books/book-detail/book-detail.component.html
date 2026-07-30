@@ -107,7 +107,7 @@
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div>
-              <h6>User #{{ review.userId }}</h6>
+              <h6>{{ review.username || ('User #' + review.userId) }}</h6>
               <div class="rating-small">
                 <span *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= review.rating">★</span>
               </div>

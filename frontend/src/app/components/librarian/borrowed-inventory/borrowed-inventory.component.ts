@@ -27,6 +27,8 @@ export class BorrowedInventoryComponent implements OnInit, OnDestroy {
   totalElements = 0;
   selectedCondition: Record<number, string> = {};
   damageNotes: Record<number, string> = {};
+  lostFineAmount: Record<number, number> = {};
+  lostNotes: Record<number, string> = {};
   processingId: number | null = null;
 
   private readonly destroy$ = new Subject<void>();
@@ -159,6 +161,33 @@ export class BorrowedInventoryComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.processingId = null;
           this.error = err.error?.message || 'Failed to return book';
+        }
+      });
+  }
+
+  markAsLost(record: BorrowRecord): void {
+    const enteredFine = Number(this.lostFineAmount[record.id]);
+    if (!enteredFine || enteredFine <= 0) {
+      this.error = 'Enter a valid fine amount greater than 0 before marking the book as lost.';
+      return;
+    }
+
+    this.processingId = record.id;
+    this.borrowService.markBorrowAsLost(record.id, {
+      fineAmount: enteredFine,
+      notes: this.lostNotes[record.id] || ''
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.processingId = null;
+          this.successMessage = 'Book marked as lost, fine applied, and member notified.';
+          this.loadInventory();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (err) => {
+          this.processingId = null;
+          this.error = err.error?.message || 'Failed to mark book as lost';
         }
       });
   }

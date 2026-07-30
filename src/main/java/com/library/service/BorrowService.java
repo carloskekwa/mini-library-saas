@@ -76,6 +76,11 @@ public class BorrowService {
             throw new IllegalStateException("Maximum borrow limit (" + MAX_ACTIVE_BORROWS + ") reached");
         }
 
+        // Members with overdue books cannot create new borrow demands.
+        if (borrowRecordRepository.hasOverdueBorrow(userId)) {
+            throw new IllegalStateException("You have overdue books. Please return overdue items before borrowing another book.");
+        }
+
         // Check if user already has this book borrowed
         if (borrowRecordRepository.findActiveByUserAndBook(userId, bookId).isPresent()) {
             throw new IllegalStateException("User already has this book borrowed");
@@ -231,6 +236,64 @@ public class BorrowService {
 
         logger.info("Book returned successfully: returnId={}, borrowId={}, daysLate={}, fineAmount={}",
             saved.getId(), borrowRecordId, daysLate, fineAmount);
+
+        return ReturnRecordDTO.from(saved);
+    }
+
+    /**
+     * Mark an active borrow as lost and apply a fine.
+     */
+    public ReturnRecordDTO markBorrowAsLost(Long borrowRecordId, BigDecimal fineAmount, String notes) {
+        logger.info("Marking borrow as lost: borrowRecordId={}, fineAmount={}", borrowRecordId, fineAmount);
+
+        if (fineAmount == null || fineAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Fine amount must be greater than zero");
+        }
+
+        BorrowRecord borrowRecord = borrowRecordRepository.findById(borrowRecordId)
+            .orElseThrow(() -> new ResourceNotFoundException("Borrow record not found with id: " + borrowRecordId));
+
+        if (!borrowRecord.getStatus().equals(BorrowRecord.BorrowStatus.BORROWED) &&
+            !borrowRecord.getStatus().equals(BorrowRecord.BorrowStatus.OVERDUE)) {
+            throw new IllegalStateException("Only borrowed or overdue books can be marked as lost");
+        }
+
+        LocalDateTime processedAt = LocalDateTime.now();
+        int daysLate = 0;
+        if (borrowRecord.getDueDate() != null && processedAt.isAfter(borrowRecord.getDueDate())) {
+            daysLate = (int) ChronoUnit.DAYS.between(borrowRecord.getDueDate(), processedAt);
+        }
+
+        String damageNotes = "Book reported lost by librarian.";
+        if (notes != null && !notes.trim().isEmpty()) {
+            damageNotes = damageNotes + " " + notes.trim();
+        }
+
+        ReturnRecord returnRecord = new ReturnRecord(borrowRecord, borrowRecord.getUser(), processedAt);
+        returnRecord.setBookCondition(ReturnRecord.BookCondition.DAMAGED);
+        returnRecord.setDamageNotes(damageNotes);
+        returnRecord.setDaysLate(daysLate);
+        returnRecord.setFineAmount(fineAmount);
+        returnRecord.setFinePaid(false);
+
+        ReturnRecord saved = returnRecordRepository.save(returnRecord);
+
+        borrowRecord.setReturnDate(processedAt);
+        borrowRecord.setStatus(BorrowRecord.BorrowStatus.LOST);
+        borrowRecord.setIsOverdue(false);
+        borrowRecordRepository.save(borrowRecord);
+
+        notificationService.createNotificationWithRelated(
+            borrowRecord.getUser().getId(),
+            Notification.NotificationType.FINE_NOTIFICATION,
+            "Book Marked As Lost",
+            "Your borrowed book '" + borrowRecord.getBook().getTitle() + "' was marked as lost. Fine due: $" + fineAmount + ".",
+            borrowRecord.getBook().getId(),
+            borrowRecord.getId()
+        );
+
+        logger.info("Borrow marked as lost: borrowId={}, returnId={}, userId={}",
+            borrowRecordId, saved.getId(), borrowRecord.getUser().getId());
 
         return ReturnRecordDTO.from(saved);
     }
