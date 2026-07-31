@@ -2,8 +2,7 @@ package com.library.repository;
 
 import com.library.entity.Book;
 import com.library.entity.Book.BookStatus;
-import com.library.entity.Category;
-import org.springframework.data.domain.Page;
+import com.library.entity.Category;import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -81,5 +80,27 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      */
     @Query(value = "SELECT b FROM Book b ORDER BY b.createdAt DESC")
     Page<Book> findRecentBooks(Pageable pageable);
+
+    // -------------------------------------------------------------------------
+    // AI feature queries
+    // -------------------------------------------------------------------------
+
+    /**
+     * Books with zero available copies that have at least one pending/notified reservation.
+     * Used by AI librarian insights to surface high-demand, unavailable titles.
+     * Columns: title, reservationCount
+     */
+    @Query("SELECT b.title, COUNT(r) FROM Book b JOIN Reservation r ON r.book.id = b.id " +
+           "WHERE b.availableCopies = 0 AND r.status IN ('PENDING', 'NOTIFIED') " +
+           "GROUP BY b.id, b.title HAVING COUNT(r) > 0 ORDER BY COUNT(r) DESC")
+    List<Object[]> findUnavailableBooksWithPendingReservations();
+
+    /**
+     * Titles of books that have never appeared in any borrow record.
+     * Used by AI librarian insights to identify unpopular items.
+     */
+    @Query("SELECT b.title FROM Book b WHERE b.id NOT IN " +
+           "(SELECT DISTINCT br.book.id FROM BorrowRecord br)")
+    List<String> findNeverBorrowedBookTitles();
 
 }

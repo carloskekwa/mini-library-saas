@@ -56,6 +56,45 @@ services:
       timeout: 5s
       retries: 5
 
+  # Ollama — local LLM runtime (chat + embeddings)
+  # After first `docker-compose up`, pull the required models:
+  #   docker exec library-ollama ollama pull nomic-embed-text
+  #   docker exec library-ollama ollama pull llama3.2
+  ollama:
+    image: ollama/ollama:latest
+    container_name: library-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - library-network
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/11434' 2>/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # ChromaDB — vector store for book embeddings
+  chromadb:
+    image: chromadb/chroma:0.5.20
+    container_name: library-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - library-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/api/v1/heartbeat || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
   # Spring Boot Application
   app:
     build:
@@ -75,6 +114,11 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT}
       LOGGING_LEVEL_COM_LIBRARY: ${LOGGING_LEVEL_COM_LIBRARY}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-llama3.2}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      CHROMA_HOST: http://chromadb
+      CHROMA_PORT: 8000
     ports:
       - "8080:8080"
     depends_on:
@@ -83,6 +127,10 @@ services:
       redis:
         condition: service_healthy
       mailhog:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      chromadb:
         condition: service_healthy
     networks:
       - library-network
@@ -122,6 +170,10 @@ volumes:
   mysql_data:
     driver: local
   redis_data:
+    driver: local
+  ollama_data:
+    driver: local
+  chroma_data:
     driver: local
 
 networks:

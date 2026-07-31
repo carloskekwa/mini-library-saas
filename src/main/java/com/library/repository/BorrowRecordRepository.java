@@ -87,4 +87,27 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long
            "WHERE br.user.id = :userId AND (br.status = 'OVERDUE' OR (br.status = 'BORROWED' AND br.dueDate < CURRENT_TIMESTAMP))")
     boolean hasOverdueBorrow(@Param("userId") Long userId);
 
+    // -------------------------------------------------------------------------
+    // AI feature queries
+    // -------------------------------------------------------------------------
+
+    /**
+     * Return the titles of the most recently borrowed books for a user.
+     * Used for personalising AI recommendations.
+     */
+    @Query("SELECT br.book.title FROM BorrowRecord br " +
+           "WHERE br.user.id = :userId AND br.status NOT IN ('PENDING', 'REJECTED') " +
+           "ORDER BY br.createdAt DESC")
+    List<String> findRecentBorrowTitlesByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * Return borrow counts per book for AI librarian insights.
+     * Columns: title, author, borrowCount, availableCopies
+     */
+    @Query("SELECT br.book.title, br.book.author, COUNT(br), br.book.availableCopies " +
+           "FROM BorrowRecord br " +
+           "GROUP BY br.book.id, br.book.title, br.book.author, br.book.availableCopies " +
+           "ORDER BY COUNT(br) DESC")
+    List<Object[]> findBookBorrowCounts(Pageable pageable);
+
 }

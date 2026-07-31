@@ -57,6 +57,26 @@ spring:
     deserialization:
       fail-on-unknown-properties: false
 
+  # Spring AI — Ollama + ChromaDB
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://ollama:11434}
+      chat:
+        options:
+          model: ${OLLAMA_CHAT_MODEL:llama3.2}
+          temperature: 0.3
+          num-predict: 1024
+      embedding:
+        options:
+          model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+    vectorstore:
+      chroma:
+        client:
+          host: ${CHROMA_HOST:http://chromadb}
+          port: ${CHROMA_PORT:8000}
+        collection-name: library-books
+        initialize-schema: true
+
 # Server Configuration
 server:
   servlet:
@@ -78,7 +98,6 @@ logging:
     com.library: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

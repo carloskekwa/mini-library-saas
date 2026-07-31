@@ -148,6 +148,17 @@ export const appRoutes: Routes = [
     data: { roles: ['ADMIN'] }
   },
   {
+    path: 'ai-assistant',
+    loadComponent: () => import('./components/ai/ai-assistant/ai-assistant.component').then(m => m.AiAssistantComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'ai-insights',
+    loadComponent: () => import('./components/ai/ai-insights/ai-insights.component').then(m => m.AiInsightsComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['LIBRARIAN', 'ADMIN'] }
+  },
+  {
     path: '**',
     redirectTo: '/dashboard/member'
   }

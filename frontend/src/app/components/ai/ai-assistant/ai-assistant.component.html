@@ -1,0 +1,101 @@
+<div class="container-main">
+  <div class="ai-header">
+    <div class="ai-header-title">
+      <i class="bi bi-robot"></i>
+      <div>
+        <h1>AI Librarian Assistant</h1>
+        <p class="lead">Discover books from our catalog using natural language — powered by Ollama.</p>
+      </div>
+    </div>
+    <button class="btn-ghost" (click)="clearChat()" *ngIf="messages.length > 0" title="Clear conversation">
+      <i class="bi bi-trash"></i> Clear
+    </button>
+  </div>
+
+  <!-- Suggested questions (shown only when chat is empty) -->
+  <div class="suggestions" *ngIf="showSuggestions">
+    <p class="suggestions-label">Try asking:</p>
+    <div class="suggestions-grid">
+      <button
+        *ngFor="let q of suggestedQuestions"
+        class="suggestion-chip"
+        (click)="sendMessage(q)">
+        <i class="bi bi-lightbulb"></i> {{ q }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat messages -->
+  <div class="chat-window" *ngIf="messages.length > 0">
+    <div
+      *ngFor="let msg of messages"
+      class="chat-message"
+      [class.user-message]="msg.role === 'user'"
+      [class.assistant-message]="msg.role === 'assistant'"
+      [class.error-message]="msg.error">
+
+      <!-- User bubble -->
+      <div *ngIf="msg.role === 'user'" class="bubble user-bubble">
+        <span>{{ msg.text }}</span>
+      </div>
+
+      <!-- Assistant bubble -->
+      <div *ngIf="msg.role === 'assistant'" class="bubble assistant-bubble">
+        <!-- Loading spinner -->
+        <div *ngIf="msg.loading" class="loading-dots">
+          <span></span><span></span><span></span>
+        </div>
+
+        <!-- LLM answer text -->
+        <p *ngIf="!msg.loading" class="answer-text" style="white-space: pre-wrap;">{{ msg.text }}</p>
+
+        <!-- Book recommendation cards -->
+        <div class="book-cards" *ngIf="msg.books && msg.books.length > 0">
+          <div class="book-card" *ngFor="let book of msg.books">
+            <div class="book-card-header">
+              <div>
+                <strong>{{ book.title }}</strong>
+                <span class="book-author">{{ book.author }}</span>
+              </div>
+              <span
+                class="availability-badge"
+                [class.available]="book.availability === 'Available'"
+                [class.unavailable]="book.availability !== 'Available'">
+                <i class="bi" [class.bi-check-circle-fill]="book.availability === 'Available'"
+                              [class.bi-x-circle-fill]="book.availability !== 'Available'"></i>
+                {{ book.availability }}
+              </span>
+            </div>
+            <div class="book-card-meta">
+              <span class="category-tag">{{ book.category }}</span>
+              <span class="copies-tag" *ngIf="book.availableCopies > 0">
+                {{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} available
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div #chatEnd></div>
+  </div>
+
+  <!-- Input bar -->
+  <div class="chat-input-bar">
+    <textarea
+      [(ngModel)]="inputText"
+      (keydown)="onKeydown($event)"
+      placeholder="Ask anything about our books..."
+      [disabled]="isLoading"
+      rows="1"
+      class="chat-input">
+    </textarea>
+    <button
+      class="send-btn"
+      (click)="sendMessage()"
+      [disabled]="isLoading || !inputText.trim()"
+      title="Send">
+      <i class="bi" [class.bi-send-fill]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+    </button>
+  </div>
+</div>

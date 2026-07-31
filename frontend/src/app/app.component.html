@@ -48,6 +48,7 @@
         <a *ngIf="canSeeMyBorrowsMenu" routerLink="/borrows" routerLinkActive="active"><i class="bi bi-journal-check"></i><span>My Borrows</span></a>
         <a *ngIf="canSeeReservationsMenu" routerLink="/reservations" routerLinkActive="active"><i class="bi bi-calendar2-check"></i><span>Reservations</span></a>
         <a *ngIf="canSeeWishlistMenu" routerLink="/wishlist" routerLinkActive="active"><i class="bi bi-heart"></i><span>Wishlist</span></a>
+        <a *ngIf="canSeeAIAssistantMenu" routerLink="/ai-assistant" routerLinkActive="active"><i class="bi bi-robot"></i><span>AI Assistant</span></a>
       </section>
 
       <section *ngIf="isLibrarian || isAdmin">
@@ -57,6 +58,7 @@
         <a *ngIf="canSeeLibrarianInventoryMenu" routerLink="/librarian/borrowed-inventory" routerLinkActive="active"><i class="bi bi-archive"></i><span>Borrowed Inventory</span></a>
         <a *ngIf="canSeeLibrarianReservationMenu" routerLink="/librarian/reservation-inventory" routerLinkActive="active"><i class="bi bi-list-check"></i><span>Reservation Inventory</span></a>
         <a *ngIf="canSeeUserConsoleMenu" routerLink="/admin/users" routerLinkActive="active"><i class="bi bi-people"></i><span>User Console</span></a>
+        <a *ngIf="canSeeAIInsightsMenu" routerLink="/ai-insights" routerLinkActive="active"><i class="bi bi-bar-chart-line"></i><span>AI Insights</span></a>
       </section>
 
       <section *ngIf="isAdmin">

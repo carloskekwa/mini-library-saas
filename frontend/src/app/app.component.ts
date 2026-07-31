@@ -102,6 +102,14 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.isMember;
   }
 
+  get canSeeAIAssistantMenu(): boolean {
+    return this.isMember;
+  }
+
+  get canSeeAIInsightsMenu(): boolean {
+    return this.isLibrarian || this.isAdmin;
+  }
+
   get canSeeBookRequestsMenu(): boolean {
     return this.isMember;
   }

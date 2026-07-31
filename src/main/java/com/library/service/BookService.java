@@ -7,8 +7,10 @@ import com.library.entity.Category;
 import com.library.exception.ResourceNotFoundException;
 import com.library.repository.BookRepository;
 import com.library.repository.CategoryRepository;
+import com.library.service.ai.VectorSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,10 +32,14 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final VectorSearchService vectorSearchService;
 
-    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository) {
+    public BookService(BookRepository bookRepository,
+                       CategoryRepository categoryRepository,
+                       @Lazy VectorSearchService vectorSearchService) {
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
+        this.vectorSearchService = vectorSearchService;
     }
 
     /**
@@ -99,6 +105,7 @@ public class BookService {
 
         Book savedBook = bookRepository.save(book);
         logger.info("Book created successfully: {} by {}", title, author);
+        indexBookSilently(savedBook);
         return savedBook;
     }
 
@@ -160,6 +167,7 @@ public class BookService {
 
         Book updatedBook = bookRepository.save(book);
         logger.info("Book updated successfully: {}", book.getTitle());
+        indexBookSilently(updatedBook);
         return updatedBook;
     }
 
@@ -168,6 +176,7 @@ public class BookService {
      */
     public void deleteBook(Long bookId) {
         Book book = getBookById(bookId);
+        vectorSearchService.deleteBook(bookId);
         bookRepository.delete(book);
         logger.info("Book deleted: {}", book.getTitle());
     }
@@ -282,6 +291,15 @@ public class BookService {
 
         if (book.getStatus() == BookStatus.BORROWED || book.getStatus() == BookStatus.OUT_OF_STOCK) {
             book.setStatus(BookStatus.AVAILABLE);
+        }
+    }
+
+    /** Index book in vector store without failing the main transaction. */
+    private void indexBookSilently(Book book) {
+        try {
+            vectorSearchService.indexBook(book);
+        } catch (Exception e) {
+            logger.warn("Vector indexing skipped for book id={}: {}", book.getId(), e.getMessage());
         }
     }
 
