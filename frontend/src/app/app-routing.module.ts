@@ -150,7 +150,8 @@ export const appRoutes: Routes = [
   {
     path: 'ai-assistant',
     loadComponent: () => import('./components/ai/ai-assistant/ai-assistant.component').then(m => m.AiAssistantComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { roles: ['MEMBER'] }
   },
   {
     path: 'ai-insights',

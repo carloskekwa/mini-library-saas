@@ -159,7 +159,7 @@ services:
     networks:
       - library-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4200/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4200/"]
       interval: 10s
       timeout: 5s
       retries: 5
