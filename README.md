@@ -681,7 +681,7 @@ Copy `.env.example` to `.env` and fill in the values.
 git clone https://github.com/your-org/mini-library-saas.git
 cd mini-library-saas
 cp .env.example .env          # fill in secrets
-docker compose up -d
+docker compose --profile dev up -d --build && docker compose exec ollama ollama pull nomic-embed-text && docker compose exec ollama ollama pull llama3.2 && docker compose restart app
 ```
 
 This starts: MySQL · Redis · MailHog · Ollama · ChromaDB · Spring Boot · Angular (nginx)
