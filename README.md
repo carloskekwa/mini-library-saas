@@ -774,6 +774,159 @@ Or use the **Re-index Books** button in the AI Insights page as an Admin.
 
 ---
 
+## Deploying to EC2 (7-day PoC)
+
+This is the recommended path to share a live demo with a team for a week at minimal cost.
+
+### Why EC2 `t3.large` + OpenAI
+
+Running Ollama (`llama3.2`) locally needs 8–16 GB RAM. On EC2 that means a `t3.xlarge` at ~$120/mo.
+Swapping to the **OpenAI API** drops the instance requirement to a `t3.large` (8 GB, ~$60/mo) — and for
+a 7-day demo the OpenAI API calls cost less than $1 total.
+
+The code already supports both providers via Spring profiles:
+
+| Profile | Provider | When to use |
+|---------|---------|------------|
+| `dev` (default) | Ollama — local, free | Local development |
+| `prod` | OpenAI — cloud API | EC2 / any server |
+
+No logic changes required — Spring AI abstracts the provider. Only config changes.
+
+---
+
+### Step 1 — Get an OpenAI API key
+
+1. Go to [platform.openai.com](https://platform.openai.com) → API Keys → Create new key
+2. Add **$5 credit** (more than enough for a week of demos)
+
+---
+
+### Step 2 — Launch EC2
+
+| Setting | Value |
+|---------|-------|
+| AMI | Ubuntu 22.04 LTS |
+| Instance type | `t3.large` (2 vCPU, 8 GB RAM) |
+| Storage | 20 GB gp3 |
+| Security group | Inbound: `22` (your IP), `80` (0.0.0.0/0), `443` (0.0.0.0/0) |
+
+---
+
+### Step 3 — Set up Docker on the instance
+
+```bash
+ssh -i your-key.pem ubuntu@<ec2-public-ip>
+
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker ubuntu && newgrp docker
+sudo apt-get install -y docker-compose-plugin
+```
+
+---
+
+### Step 4 — Clone and configure
+
+```bash
+git clone https://github.com/your-org/mini-library-saas.git
+cd mini-library-saas
+
+cp .env.example .env
+nano .env
+```
+
+Minimum `.env` values for production:
+
+```bash
+# Database
+MYSQL_ROOT_PASSWORD=StrongRootPass123!
+MYSQL_DATABASE=library_db
+MYSQL_USER=library_user
+MYSQL_PASSWORD=StrongAppPass123!
+DB_NAME=library_db
+DB_USER=library_user
+DB_PASSWORD=StrongAppPass123!
+
+# Auth
+JWT_SECRET=$(openssl rand -hex 32)   # run this to generate
+JWT_EXPIRATION_MS=86400000
+
+# AI — OpenAI
+OPENAI_API_KEY=sk-...
+
+# Logging
+LOGGING_LEVEL_ROOT=WARN
+LOGGING_LEVEL_COM_LIBRARY=INFO
+```
+
+---
+
+### Step 5 — Start the stack with the production override
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+What this does:
+- Starts: MySQL · Redis · MailHog · ChromaDB · Spring Boot · Angular
+- **Does not start Ollama** (not needed — OpenAI is used instead)
+- Sets `SPRING_PROFILES_ACTIVE=prod` → loads `application-prod.yml` → OpenAI auto-configured
+
+Verify everything is up:
+```bash
+docker compose ps
+```
+
+---
+
+### Step 6 — Access the app
+
+Your app is live at:
+```
+http://<ec2-public-ip>
+```
+
+No domain needed for a 7-day demo. If you want a cleaner URL, use [nip.io](https://nip.io):
+```
+http://3-82-45-12.nip.io   ← replace dots with dashes in the IP
+```
+
+---
+
+### Step 7 — Terminate after the demo
+
+In the AWS Console → EC2 → Instances → **Terminate**.
+Also delete the EBS volume if it wasn't auto-deleted.
+
+---
+
+### Cost Breakdown (7 days)
+
+| Item | Cost |
+|------|------|
+| EC2 `t3.large` on-demand (168 hrs) | ~$14 |
+| EBS 20 GB gp3 (7 days) | ~$0.50 |
+| OpenAI API (demo sessions) | ~$0.50 |
+| **Total** | **~$15** |
+
+---
+
+### Local Development (Ollama)
+
+Nothing changes for local dev. The default profile still uses Ollama:
+
+```bash
+# Start with Ollama (dev profile activated via --profile dev)
+docker compose --profile dev up -d
+
+# Pull models once
+docker exec library-ollama ollama pull nomic-embed-text
+docker exec library-ollama ollama pull llama3.2
+docker compose restart app
+```
+
+---
+
 ## API Documentation
 
 Interactive API docs are available at **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)** after starting the app.

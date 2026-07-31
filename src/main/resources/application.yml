@@ -57,7 +57,10 @@ spring:
     deserialization:
       fail-on-unknown-properties: false
 
-  # Spring AI — Ollama + ChromaDB
+  # Spring AI — Ollama + ChromaDB (dev default)
+  # OpenAI auto-configuration is excluded in this profile; enabled in application-prod.yml
+  autoconfigure:
+    exclude: org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration
   ai:
     ollama:
       base-url: ${OLLAMA_BASE_URL:http://ollama:11434}

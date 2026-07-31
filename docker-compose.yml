@@ -63,6 +63,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: library-ollama
+    profiles: [dev]
     ports:
       - "11434:11434"
     volumes:
@@ -111,12 +112,11 @@ services:
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
       MAIL_HOST: mailhog
       MAIL_PORT: 1025
-      SPRING_PROFILES_ACTIVE: dev
-      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT}
-      LOGGING_LEVEL_COM_LIBRARY: ${LOGGING_LEVEL_COM_LIBRARY}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-llama3.2}
       OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       CHROMA_HOST: http://chromadb
       CHROMA_PORT: 8000
     ports:
@@ -127,8 +127,6 @@ services:
       redis:
         condition: service_healthy
       mailhog:
-        condition: service_healthy
-      ollama:
         condition: service_healthy
       chromadb:
         condition: service_healthy

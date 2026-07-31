@@ -205,10 +205,17 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring AI: Ollama (chat + embeddings) -->
+        <!-- Spring AI: Ollama (chat + embeddings) — local dev -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
+        <!-- Spring AI: OpenAI (chat + embeddings) — production -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
 

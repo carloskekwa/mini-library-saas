@@ -22,6 +22,30 @@ spring:
             enable: true
             required: true
 
+  # Disable Ollama in production; OpenAI is used instead
+  autoconfigure:
+    exclude: org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration
+
+  # Spring AI — OpenAI (production)
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.3
+          max-tokens: 1024
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    vectorstore:
+      chroma:
+        client:
+          host: ${CHROMA_HOST:http://chromadb}
+          port: ${CHROMA_PORT:8000}
+        collection-name: library-books
+        initialize-schema: true
+
 server:
   servlet:
     context-path: /
