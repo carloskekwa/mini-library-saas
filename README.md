@@ -395,7 +395,93 @@ Per-user, per-endpoint API rate limiting.
 
 The AI module adds two intelligent features on top of the core library platform.
 
-#### How it works — RAG (Retrieval-Augmented Generation)
+#### How it works — Plain English
+
+Imagine you walk into a **magic library** with a really smart librarian helper robot. Here's what happens when you ask it a question:
+
+**You ask:** *"Can you recommend a fantasy adventure book?"*
+
+**Step 1 — The robot translates your words into numbers**
+
+Your question gets converted into a list of 768 numbers called an **embedding** — a language that math can understand. This happens via `EmbeddingService` using `nomic-embed-text` running inside Ollama.
+
+```
+"fantasy adventure"  →  [0.82, 0.14, 0.67, 0.03, ...]  (768 numbers)
+```
+
+**Step 2 — It searches its memory (ChromaDB)**
+
+Every book in the library was already converted into the same number language when it was added and stored in **ChromaDB**. The robot compares your numbers against all the book numbers and finds the **5 books whose numbers are closest** — closest numbers means most similar meaning.
+
+```
+Finds: The Hobbit, Harry Potter, Lord of the Rings, Sherlock Holmes, 1984
+```
+
+This happens in `VectorSearchService.searchSimilar()`.
+
+**Step 3 — It checks the real library shelf**
+
+The robot queries MySQL to see which of those 5 books are **actually available right now** — not checked out, not lost.
+
+**Step 4 — It remembers what you like** *(personalisation)*
+
+If you're logged in, the robot checks your **borrowing history**: *"this person previously borrowed Harry Potter — they like magic stories."* This comes from `BorrowRecordRepository.findRecentBorrowTitlesByUserId()`.
+
+**Step 5 — It writes a note for the big brain**
+
+The robot writes a detailed prompt (`buildPrompt()`) to the large language model — `llama3.2` — listing only the books that actually exist in the catalog:
+
+```
+You are a library assistant.
+Here are the books we actually have:
+  • The Hobbit by Tolkien — fantasy — 3 copies available
+  • Harry Potter — fantasy — 4 copies available
+  ...
+The user wants: "fantasy adventure book".
+Only recommend from this list. Never make up books.
+```
+
+**Step 6 — `llama3.2` writes a friendly answer**
+
+The AI reads the note and writes back a recommendation in natural language:
+
+```
+Book title: The Hobbit
+Author: J.R.R. Tolkien
+Why this book matches: An epic fantasy adventure full of dragons and quests.
+Availability: Available
+```
+
+**Step 7 — You get back two things**
+
+1. The AI's written narrative
+2. Structured **book cards** with title, author, category, and a green/red availability badge
+
+#### Why can't the AI invent books?
+
+Because in Step 5, the robot only shows `llama3.2` books that are **already in the MySQL database**. The model is instructed to recommend nothing outside that list. This is what makes the architecture **RAG (Retrieval-Augmented Generation)** — retrieve first, then generate.
+
+```
+You ask a question
+       ↓
+Secret number translation   (nomic-embed-text via EmbeddingService)
+       ↓
+Find similar books           (ChromaDB via VectorSearchService)
+       ↓
+Check real availability      (MySQL via BookRepository)
+       ↓
+Add personalisation context  (BorrowRecordRepository)
+       ↓
+Write a grounded prompt      (RecommendationService.buildPrompt)
+       ↓
+AI writes friendly answer    (llama3.2 via ChatClient)
+       ↓
+Book cards + narrative       (Angular AI Assistant UI)
+```
+
+---
+
+#### How it works — Technical Detail (RAG)
 
 The AI **never hallucinates books**. Every recommendation is grounded in the actual library catalog:
 
