@@ -839,20 +839,20 @@ Minimum `.env` values for production:
 
 ```bash
 # Database
-MYSQL_ROOT_PASSWORD=StrongRootPass123!
+MYSQL_ROOT_PASSWORD=
 MYSQL_DATABASE=library_db
 MYSQL_USER=library_user
-MYSQL_PASSWORD=StrongAppPass123!
+MYSQL_PASSWORD=
 DB_NAME=library_db
 DB_USER=library_user
-DB_PASSWORD=StrongAppPass123!
+DB_PASSWORD=
 
 # Auth
 JWT_SECRET=$(openssl rand -hex 32)   # run this to generate
 JWT_EXPIRATION_MS=86400000
 
 # AI — OpenAI
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=
 
 # Logging
 LOGGING_LEVEL_ROOT=WARN
