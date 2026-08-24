@@ -18,6 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   currentUser: any = null;
   unreadNotificationCount = 0;
+  sidebarOpen = false;
   private destroy$ = new Subject<void>();
   private navHistory: string[] = [];
   private readonly AUTH_ROUTES = ['/login', '/register'];
@@ -42,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe((e: any) => {
       const url: string = (e as NavigationEnd).urlAfterRedirects;
+      this.sidebarOpen = false;
       if (!this.AUTH_ROUTES.some(r => url.startsWith(r))) {
         const last = this.navHistory[this.navHistory.length - 1];
         if (last !== url) {
@@ -177,5 +179,9 @@ export class AppComponent implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.router.navigateByUrl('/login');
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
   }
 }

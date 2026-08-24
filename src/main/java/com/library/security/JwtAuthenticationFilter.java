@@ -1,5 +1,8 @@
 package com.library.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,10 +57,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 logger.debug("Set user authentication for user: {}", username);
             }
-        } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context: {}", ex.getMessage());
-        }
-
+        }  catch (SignatureException | MalformedJwtException | ExpiredJwtException ex) {
+           logger.warn("Invalid JWT: {}", ex.getMessage());
+           response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+           return; // stop the filter chain
+       } catch (Exception ex) {
+          logger.error("Could not set user authentication: {}", ex.getMessage());
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          return;
+    }
         filterChain.doFilter(request, response);
     }
 

@@ -63,7 +63,6 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-            .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/", "/index.html", "/static/**", "/resources/**").permitAll()
                 .requestMatchers("/error").permitAll()

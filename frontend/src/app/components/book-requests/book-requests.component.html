@@ -42,7 +42,7 @@
       <h5 class="mb-0">All Requests (Staff View)</h5>
       <div class="d-flex align-items-center gap-2">
         <label class="form-label mb-0" for="staff-status-filter">Status</label>
-        <select id="staff-status-filter" class="form-select form-select-sm" style="width: 180px;" [(ngModel)]="selectedStaffStatus">
+        <select id="staff-status-filter" class="form-select form-select-sm w-auto" [(ngModel)]="selectedStaffStatus">
           <option *ngFor="let statusOption of staffStatusOptions" [value]="statusOption">{{ statusOption }}</option>
         </select>
       </div>

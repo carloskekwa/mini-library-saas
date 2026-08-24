@@ -330,3 +330,9 @@ span {
     border-radius: 16px;
   }
 }
+
+@media (max-width: 480px) {
+  .container-main {
+    padding: var(--space-3);
+  }
+}

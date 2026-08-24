@@ -1,6 +1,10 @@
 <div class="app-shell">
   <header class="app-topbar">
     <div class="topbar-left">
+      <button *ngIf="isLoggedIn" class="hamburger-btn" (click)="toggleSidebar()" [attr.aria-expanded]="sidebarOpen" aria-label="Toggle navigation">
+        <i [class]="sidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
+      </button>
+
       <a class="brand" routerLink="/books" aria-label="Mini Library Home">
         <span class="brand-icon"><i class="bi bi-cloud-fill"></i></span>
         <span class="brand-copy">
@@ -40,7 +44,8 @@
   </header>
 
   <div class="app-body" [class.with-sidebar]="isLoggedIn">
-    <aside class="app-sidebar" *ngIf="isLoggedIn">
+    <div class="sidebar-backdrop" *ngIf="isLoggedIn && sidebarOpen" (click)="toggleSidebar()"></div>
+    <aside class="app-sidebar" *ngIf="isLoggedIn" [class.sidebar-open]="sidebarOpen">
       <section>
         <h6>Workspace</h6>
         <a [routerLink]="dashboardRoute" routerLinkActive="active"><i class="bi bi-grid"></i><span>Dashboard</span></a>

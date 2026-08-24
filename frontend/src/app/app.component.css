@@ -243,6 +243,31 @@
   padding: 0.15rem;
 }
 
+/* Hamburger — hidden on desktop */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(182, 198, 218, 0.9);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+  color: #2f455f;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* Slide-over backdrop — only rendered when sidebar is open on mobile */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 30, 55, 0.38);
+  z-index: 199;
+  cursor: pointer;
+}
+
 @media (max-width: 1100px) {
   .app-topbar {
     grid-template-columns: 1fr;
@@ -257,15 +282,44 @@
 
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
+  /* Collapse sidebar column — content takes full width */
+  .app-body.with-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Sidebar becomes a fixed left drawer */
+  .app-sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: -290px;
+    height: 100vh;
+    width: 270px;
+    z-index: 200;
+    border-radius: 0 20px 20px 0;
+    overflow-y: auto;
+    transition: left 0.25s ease;
+    padding-top: 1.25rem;
+  }
+
+  .app-sidebar.sidebar-open {
+    left: 0;
+  }
+
+  /* Show hamburger, hide backdrop when sidebar is closed */
+  .hamburger-btn {
+    display: inline-flex;
+  }
+
+  /* Tighten shell padding on small screens */
   .app-shell {
     padding: 0.65rem;
+    gap: 0.65rem;
   }
+}
 
-  .app-sidebar {
-    grid-template-columns: 1fr;
-  }
-
+@media (max-width: 760px) {
   .topbar-actions {
     justify-content: space-between;
     width: 100%;
@@ -274,5 +328,17 @@
 
   .profile-chip {
     flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hide subtitle text to free topbar space */
+  .brand-copy small {
+    display: none;
+  }
+
+  /* Hide name/role text, keep avatar + logout */
+  .profile-copy {
+    display: none;
   }
 }
